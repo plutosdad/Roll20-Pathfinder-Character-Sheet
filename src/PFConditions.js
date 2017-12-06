@@ -17,13 +17,13 @@ import * as PFAttacks from './PFAttacks';
 import * as PFEncumbrance from './PFEncumbrance';
 
 export function setParalyzed(dummy,dummy2,eventInfo){
-	PFAbilityScores.updateAbilityScore('DEX');
-	PFAbilityScores.updateAbilityScore('STR');
+	PFAbilityScores.setAbilityScoreAsync('DEX');
+	PFAbilityScores.setAbilityScoreAsync('STR');
 	PFDefense.applyConditions(null,null,eventInfo);
 }
 
 export function setHelpless(dummy,dummy2,eventInfo){
-    PFAbilityScores.updateAbilityScore('DEX');
+    PFAbilityScores.setAbilityScoreAsync('DEX');
 	PFDefense.applyConditions(null,null,eventInfo);
 }
 
@@ -65,9 +65,10 @@ function togglePinnedState (dummy,dummy2,eventInfo) {
 
 function setFatiguedExhausted(eventInfo){
 	//TAS.debug("PFConditions setFatiguedExhausted",v);
-	PFAbilityScores.applyConditions(null,null,eventInfo);
-	PFAttackGrid.applyConditions(null,null,eventInfo);
-	PFEncumbrance.updateModifiedSpeed();		
+	PFAbilityScores.applyConditions(function(){
+		PFAttackGrid.applyConditions(null,null,eventInfo);
+		PFEncumbrance.updateModifiedSpeed();		
+	},null,eventInfo);
 }
 
 function toggleFatiguedState (dummy,dummy2,eventInfo) {

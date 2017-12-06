@@ -16,12 +16,12 @@ function applyTemplate(name){
 			tempstr = SWUtils.getTranslated('giant');
 			setter['npc-type'] = tempstr+' '+v['npc-type'];
 
-			setter = PFAbilityScores.modifyAbility('STR',4,v,setter);
-			setter = PFAbilityScores.modifyAbility('DEX',-2,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('STR',4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('DEX',-2,v,setter);
 			if(!parseInt(v.is_undead,10)){
-				setter = PFAbilityScores.modifyAbility('CON',4,v,setter);
+				setter = PFAbilityScores.updateAbilityBaseDiff('CON',4,v,setter);
 			} else {
-				setter = PFAbilityScores.modifyAbility('CHA',4,v,setter);
+				setter = PFAbilityScores.updateAbilityBaseDiff('CHA',4,v,setter);
 			}
 
 			tempint = parseInt(v['AC-natural'],10)||0;
@@ -44,12 +44,12 @@ function applyTemplate(name){
 				setter['npc-type'] = v['npc-type'].replace(tempstr,'');
 			}
 
-			setter = PFAbilityScores.modifyAbility('STR',-4,v,setter);
-			setter = PFAbilityScores.modifyAbility('DEX',2,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('STR',-4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('DEX',2,v,setter);
 			if(!parseInt(v.is_undead,10)){
-				setter = PFAbilityScores.modifyAbility('CON',-4,v,setter);
+				setter = PFAbilityScores.updateAbilityBaseDiff('CON',-4,v,setter);
 			} else {
-				setter = PFAbilityScores.modifyAbility('CHA',-4,v,setter);
+				setter = PFAbilityScores.updateAbilityBaseDiff('CHA',-4,v,setter);
 			}
 			tempint = parseInt(v['AC-natural'],10)||0;
 			tempint-=3;
@@ -69,12 +69,12 @@ function applyTemplate(name){
 			tempstr = SWUtils.getTranslated('young');
 			setter['npc-type'] = tempstr+' '+v['npc-type'];
 
-			setter = PFAbilityScores.modifyAbility('STR',-4,v,setter);
-			setter = PFAbilityScores.modifyAbility('DEX',4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('STR',-4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('DEX',4,v,setter);
 			if(!parseInt(v.is_undead,10)){
-				setter = PFAbilityScores.modifyAbility('CON',-4,v,setter);
+				setter = PFAbilityScores.updateAbilityBaseDiff('CON',-4,v,setter);
 			} else {
-				setter = PFAbilityScores.modifyAbility('CHA',-4,v,setter);
+				setter = PFAbilityScores.updateAbilityBaseDiff('CHA',-4,v,setter);
 			}
 
 			tempint = parseInt(v['AC-natural'],10)||0;
@@ -98,12 +98,12 @@ function applyTemplate(name){
 			if (v['npc-type']){
 				setter['npc-type'] = v['npc-type'].replace(tempstr,'');
 			}
-			setter = PFAbilityScores.modifyAbility('STR',4,v,setter);
-			setter = PFAbilityScores.modifyAbility('DEX',-4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('STR',4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('DEX',-4,v,setter);
 			if(!parseInt(v.is_undead,10)){
-				setter = PFAbilityScores.modifyAbility('CON',4,v,setter);
+				setter = PFAbilityScores.updateAbilityBaseDiff('CON',4,v,setter);
 			} else {
-				setter = PFAbilityScores.modifyAbility('CHA',4,v,setter);
+				setter = PFAbilityScores.updateAbilityBaseDiff('CHA',4,v,setter);
 			}
 
 			tempint = parseInt(v['AC-natural'],10)||0;
@@ -123,16 +123,16 @@ function applyTemplate(name){
 			tempstr = SWUtils.getTranslated('advanced');
 			setter['npc-type'] = tempstr+' '+v['npc-type'];
 
-			setter = PFAbilityScores.modifyAbility('STR',4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('STR',4,v,setter);
 			if(!parseInt(v.is_undead,10)){
-				setter = PFAbilityScores.modifyAbility('CON',4,v,setter);
+				setter = PFAbilityScores.updateAbilityBaseDiff('CON',4,v,setter);
 			}
-			setter = PFAbilityScores.modifyAbility('DEX',4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('DEX',4,v,setter);
 			if(parseInt(v['INT-base'])>2){
-				setter = PFAbilityScores.modifyAbility('INT',4,v,setter);
+				setter = PFAbilityScores.updateAbilityBaseDiff('INT',4,v,setter);
 			}
-			setter = PFAbilityScores.modifyAbility('WIS',4,v,setter);
-			setter = PFAbilityScores.modifyAbility('CHA',4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('WIS',4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('CHA',4,v,setter);
 
 			tempint = parseInt(v['AC-natural'],10)||0;
 			tempint+=2;
@@ -150,14 +150,14 @@ function applyTemplate(name){
 			var setter={},tempstr='',tempint=0;
 			tempstr = SWUtils.getTranslated('degenerate');
 			setter['npc-type'] = tempstr+' '+v['npc-type'];
-			setter = PFAbilityScores.modifyAbility('STR',-4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('STR',-4,v,setter);
 			if(!parseInt(v.is_undead,10)){
-				setter = PFAbilityScores.modifyAbility('CON',-4,v,setter);
+				setter = PFAbilityScores.updateAbilityBaseDiff('CON',-4,v,setter);
 			}
-			setter = PFAbilityScores.modifyAbility('DEX',-4,v,setter);
-			setter = PFAbilityScores.modifyAbility('INT',-4,v,setter);
-			setter = PFAbilityScores.modifyAbility('WIS',-4,v,setter);
-			setter = PFAbilityScores.modifyAbility('CHA',-4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('DEX',-4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('INT',-4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('WIS',-4,v,setter);
+			setter = PFAbilityScores.updateAbilityBaseDiff('CHA',-4,v,setter);
 			tempint = parseInt(v['AC-natural'],10)||0;
 			tempint-=2;
 			setter['AC-natural']=tempint;

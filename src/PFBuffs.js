@@ -161,12 +161,12 @@ events = {
 		"cmb2": [PFAttackGrid.updateAttackGrid]
 	},
 	buffTotalAbilityEvents: {
-		"STR": [PFAbilityScores.updateAbilityScore],
-		"DEX": [PFAbilityScores.updateAbilityScore],
-		"CON": [PFAbilityScores.updateAbilityScore],
-		"INT": [PFAbilityScores.updateAbilityScore],
-		"WIS": [PFAbilityScores.updateAbilityScore],
-		"CHA": [PFAbilityScores.updateAbilityScore]
+		"STR": [PFAbilityScores.setAbilityScoreAsync],
+		"DEX": [PFAbilityScores.setAbilityScoreAsync],
+		"CON": [PFAbilityScores.setAbilityScoreAsync],
+		"INT": [PFAbilityScores.setAbilityScoreAsync],
+		"WIS": [PFAbilityScores.setAbilityScoreAsync],
+		"CHA": [PFAbilityScores.setAbilityScoreAsync]
 	},
 	buffEventsTotalOnUpdate :{
 		"buff_Check-total":[PFSkills.updateAllSkillsDiff],
@@ -2185,17 +2185,20 @@ function registerEventHandlers () {
 			}));
 		});
 	});
+	/* moved to PFAbilityScores
 	_.each(events.buffTotalAbilityEvents, function (functions, col) {
 		var eventToWatch = "change:buff_" + col + "-total change:buff_" + col + "-total_penalty";
 		_.each(functions, function (methodToCall) {
 			on(eventToWatch, TAS.callback(function event_updateBuffAbilityEvents(eventInfo) {
 				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
 				if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
-					methodToCall(col, eventInfo);
+					PFAbilityScores.updateAbilityScoreDiffQuick(eventInfo);
+					//methodToCall(col, eventInfo);
 				}
 			}));
 		});
 	});
+	*/
 	_.each(events.buffTotalEventsNoParam, function (functions, col) {
 		var eventToWatch = "change:buff_" + col + "-total";
 		_.each(functions, function (methodToCall) {
