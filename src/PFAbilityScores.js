@@ -1,14 +1,13 @@
 'use strict';
 import _ from 'underscore';
 import TAS from 'exports-loader?TAS!TheAaronSheet';
-import {PFLog, PFConsole} from './PFLog';
 import * as SWUtils from './SWUtils';
 import PFConst from './PFConst';
 import * as PFUtils from './PFUtils';
 import * as PFAttacks from './PFAttacks';
 
-export var abilities = ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
-export var abilitymods = ["STR-mod", "DEX-mod", "CON-mod", "INT-mod", "WIS-mod", "CHA-mod"];
+export var abilities = ["STR", "DEX", "CON", "INT", "WIS", "CHA"],
+abilitymods = ["STR-mod", "DEX-mod", "CON-mod", "INT-mod", "WIS-mod", "CHA-mod"];
 var columnMods = [ "-base",  "-enhance",  "-inherent",  "-misc",  "-damage",  "-penalty",  "-drain",  "-mod",  "-cond",  "-modded"],
 columnBuffMods = [  "-total",  "-total_penalty"],
 columnModHelpers=[ "condition-Helpless", "condition-Paralyzed"],
@@ -479,22 +478,6 @@ export function applyConditions (callback, silently, eventInfo) {
         }
     });
 }
-/** calls updateAbilityScoreDiffAsync if there is a change */
-function updateAbilityScoreDiffQuick (eventInfo){
-    var prev=parseInt(eventInfo.previousValue,10),
-        newv=parseInt(eventInfo.newValue,10);
-    if(!isNaN(newv) && !isNaN(newv) && prev!==newv){
-        updateAbilityScoreDiffAsync(null,false,eventInfo.sourceAttribute,newv,prev);
-    }
-}
-/** calls propagateAbilityModsAsync if there is a change */
-function updateAbilityScoreModQuick (eventInfo){
-    var prev=parseInt(eventInfo.previousValue,10),
-        newv=parseInt(eventInfo.newValue,10);
-    if(!isNaN(newv) && !isNaN(newv) && prev!==newv){
-        propagateAbilityModsAsync(null,false,eventInfo.sourceAttribute,newv,prev);
-    }
-}
 
 /** migrate (currently empty just calls callback*/
 export var migrate = TAS.callback(function callPFAbilityScoreMigrate(callback,oldversion){
@@ -524,7 +507,24 @@ export var recalculate = TAS.callback(function callPFAbilityScoresRecalculate(ca
 /** Calls 'on' function for everything related to this module */
 function registerEventHandlers () {
 
-    var tempEventToWatch=abilities.map(function(ability){
+    /** calls updateAbilityScoreDiffAsync if there is a change */
+    var updateAbilityScoreDiffQuick =function(eventInfo){
+        var prev=parseInt(eventInfo.previousValue,10),
+            newv=parseInt(eventInfo.newValue,10);
+        if(!isNaN(newv) && !isNaN(newv) && prev!==newv){
+            updateAbilityScoreDiffAsync(null,false,eventInfo.sourceAttribute,newv,prev);
+        }
+    },
+    /** calls propagateAbilityModsAsync if there is a change */
+    updateAbilityScoreModQuick =function(eventInfo){
+        var prev=parseInt(eventInfo.previousValue,10),
+            newv=parseInt(eventInfo.newValue,10);
+        if(!isNaN(newv) && !isNaN(newv) && prev!==newv){
+            propagateAbilityModsAsync(null,false,eventInfo.sourceAttribute,newv,prev);
+        }
+    },
+
+     tempEventToWatch=abilities.map(function(ability){
         return events.abilityEventsAuto.replace(/REPLACE/g, ability);
     }).join(' ');
 
