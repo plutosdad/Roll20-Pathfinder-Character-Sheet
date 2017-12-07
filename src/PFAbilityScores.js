@@ -71,30 +71,6 @@ export function updateAbilityBaseDiff (ability,val,v,setter){
     return setter;    
 }
 
-/** Get all attributes needed to calulate an ability score
- * @param {string} ability one of 6 uppercase
- * @returns {[string]} attribute names
- */
-function getAttributes (ability){
-    var fields = _.map(columnMods,function(col){return ability+col;});
-    fields.push(ability);
-    fields = fields.concat( _.map(columnBuffMods,function(col){
-        return 'buff_'+ability+col;
-    }));
-    fields = fields.concat(columnModHelpers);
-    return fields;
-}
-/** Get all attributes needed to calulate ALL ability scores
- * @returns {[string]} attribute names
- */
-function getAllAttributes (){
-    var fields = SWUtils.cartesianAppend(abilities,columnMods);
-    fields = fields.concat(abilities);
-    fields = fields.concat(SWUtils.cartesianAppend(['buff_'],abilities,columnBuffMods));
-    fields = fields.concat(columnModHelpers);
-    return fields;
-}
-
 /** Updates each dropdown set to the abilityModName to the newval
  * Dropdown fields are found in PFConst.abilityScoreManualDropdowns
  * @param {string} abilityModName the STR-mod DEX-mod etc name
@@ -162,7 +138,6 @@ function propagateAbilityModsAsync(callback,silently,attr,newval,oldval){
         }
     });
 }
-
 
 /** Looks at current values and calculates new ability , ability-mod and ability-modded values
  * @param {string} ability string matching a value in abilities
@@ -254,7 +229,7 @@ function setAbilityScore (ability, values, setter) {
     }
 }
 
-/** pdates the final ability score, ability modifier, condition column based on entries in ability grid plus conditions and buffs.
+/** Updates the final ability score, ability modifier, condition column based on entries in ability grid plus conditions and buffs.
  * Note: Ability value is not affected by damage and penalties, instead only modifier is affected.
  * @param {string} ability 3 letter abbreviation for one of the 6 ability scores, member of PFAbilityScores.abilities
  */
@@ -264,6 +239,15 @@ export function setAbilityScoreAsync (ability,eventInfo,callback,silently){
             callback();
         }
     }),
+    getAttributes = function(ability){
+        var fields = _.map(columnMods,function(col){return ability+col;});
+        fields.push(ability);
+        fields = fields.concat( _.map(columnBuffMods,function(col){
+            return 'buff_'+ability+col;
+        }));
+        fields = fields.concat(columnModHelpers);
+        return fields;
+    },
     fields = getAttributes(ability);
     getAttrs(fields,function(v){
         var params = {}, setter={};
@@ -279,12 +263,19 @@ export function setAbilityScoreAsync (ability,eventInfo,callback,silently){
     });
 }
 /** calls getAbilityScore for all abilities */
-function setAllAbilityScores (callback, silently) {
+function setAllAbilityScoresAsync (callback, silently) {
     var done = _.once(function () {
         if (typeof callback === "function") {
             callback();
         }
     }),
+    getAllAttributes = function(){
+        var fields = SWUtils.cartesianAppend(abilities,columnMods);
+        fields = fields.concat(abilities);
+        fields = fields.concat(SWUtils.cartesianAppend(['buff_'],abilities,columnBuffMods));
+        fields = fields.concat(columnModHelpers);
+        return fields;
+    },
     fields = getAllAttributes();
     getAttrs(fields,function(v){
         var params = {}, setter={};
@@ -305,6 +296,7 @@ function setAllAbilityScores (callback, silently) {
 
 /** Quick update to ability score.
  * If only abilityScore changes and not modifier, then sets silently.
+ * can make faster if we make different version for penalty/damage and regular updates
  * 
  * @param {function} callback when done
  * @param {boolean} silently whether to set {silent:true} in setAttrs
@@ -424,8 +416,9 @@ function updateAbilityScoreDiffAsync (callback, silently, attrib, newVal, oldVal
     });
 }
 
-/** applies conditions , for paralyzed and helpless sets but does not unset
- * we never even call this for paralyzed or helpless
+/** applies conditions for exhausted, fatigued, entangled, grappled
+ * for paralyzed and helpless sets but does not unset- so we don't call it for those , can remove or else
+ * need to unset
  * 
  * @param {*} callback 
  * @param {*} silently 
@@ -446,7 +439,7 @@ export function applyConditions (callback, silently, eventInfo) {
                 silentSetter["STR"] = 0;
                 silentSetter["STR-modded"]=1;
                 setter["STR-mod"] = -5;
-            } 
+            }
             if (helpless){
                 silentSetter["DEX"] = 0;
                 silentSetter["DEX-modded"]=1;
@@ -486,7 +479,7 @@ export function applyConditions (callback, silently, eventInfo) {
         }
     });
 }
-
+/** calls updateAbilityScoreDiffAsync if there is a change */
 function updateAbilityScoreDiffQuick (eventInfo){
     var prev=parseInt(eventInfo.previousValue,10),
         newv=parseInt(eventInfo.newValue,10);
@@ -494,7 +487,7 @@ function updateAbilityScoreDiffQuick (eventInfo){
         updateAbilityScoreDiffAsync(null,false,eventInfo.sourceAttribute,newv,prev);
     }
 }
-
+/** calls propagateAbilityModsAsync if there is a change */
 function updateAbilityScoreModQuick (eventInfo){
     var prev=parseInt(eventInfo.previousValue,10),
         newv=parseInt(eventInfo.newValue,10);
@@ -521,7 +514,7 @@ export var recalculate = TAS.callback(function callPFAbilityScoresRecalculate(ca
         propagateAbilityModsAsync(done,silently);
     }),
     updateScoresOnce = _.once(function () {
-        setAllAbilityScores(updateDependentAttrs, silently);
+        setAllAbilityScoresAsync(updateDependentAttrs, silently);
     });
     migrate(function(){
         applyConditions(updateScoresOnce, silently);
