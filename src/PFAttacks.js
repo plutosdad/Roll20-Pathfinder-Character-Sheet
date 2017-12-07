@@ -187,7 +187,7 @@ function updateRepeatingWeaponDamageDiff(eventInfo,newval,oldval,callback){
 		});
 	}
 }
-export function updateRepeatingWeaponAbilityDropdowns(eventInfo,ability){
+export function updateRepeatingWeaponAbilityDropdowns(eventInfo,silently,ability){
 	getSectionIDs("repeating_weapon", function (ids) {
 		_.each(ids,function(id){
 			PFUtilsAsync.setRepeatingDropdownValue("weapon", id, "damage-ability", "damage-ability-mod",
