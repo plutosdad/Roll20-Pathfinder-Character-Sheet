@@ -1745,7 +1745,7 @@ function registerEventHandlers () {
 						//cannot call "diff" cause of mult and max, until we make single row version of diff
 						updateRepeatingWeaponDamage(null,eventInfo);
 					}
-				});
+				},true);
 		}
 	}));
 	on("change:repeating_weapon:damage", TAS.callback(function eventRepeatingWeaponDamage(eventInfo) {
