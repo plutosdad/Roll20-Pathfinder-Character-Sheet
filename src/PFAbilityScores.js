@@ -78,54 +78,43 @@ export function updateAbilityBaseDiff (ability,val,v,setter){
  * @param {Map<string,int>} setter map to set new values to (optional)
  * @returns {Map<string,int>} setter or new map
  */
-function propagateAbilityMod(abilityModName,newval,v,setter){
+function propagateAbilityMod(abilityModName,newval,v,setter,oldval){
+    TAS.debug("propagateAbilityMod: abilityModName:"+abilityModName+",newval:"+newval);
     setter = setter||{};
-    return Object.keys(PFConst.abilityScoreManualDropdowns).filter(function(a){
+    setter = Object.keys(PFConst.abilityScoreManualDropdowns).filter(function(a){
         return v[a]===abilityModName;
     }).reduce(function(m,a){
-        var oldval = parseInt(v[PFConst.abilityScoreManualDropdowns[a]],10)||0;
-        if(newval !== oldval){
+        var currval = parseInt(v[PFConst.abilityScoreManualDropdowns[a]],10)||0;
+        if(newval !== currval){
             m[PFConst.abilityScoreManualDropdowns[a]]=newval;
         }
         return m;
     },setter);
     return setter;
 }
-
-/** Looks at the ability-mod changed and then updates rest of sheet. For non repeating
- * @param {string|Array} attr string name of attribute, or array of attributes abilitymods, if null then abilitymods
- * @param {int} newval optional
- * @param {int} oldval ignored
+/** updates all non repeating ability dropdowns with the corret mods
+ * 
+ * @param {*} callback 
+ * @param {*} silently 
  */
-function propagateAbilityModsAsync(callback,silently,attr,newval,oldval){
-    var attrs, fields, done = _.once(function(){
-        if (typeof callback === "function"){
+function propagateAllAbilityModsAsync(callback,silently){
+    var done=function(){
+        if (typeof callback==="function"){
             callback();
         }
-    });
-    newval=newval||0;
-    if (Array.isArray(attr)){
-        attrs = attr;
-    } else if(attr){
-        attr = attr.slice(0,3).toUpperCase()+'-mod';
-        attrs = [attr];
-    } else {
-        attrs = abilitymods;
-    }
-    PFAttacks.updateRepeatingWeaponAbilityDropdowns(null,null,attr);    
-    fields = attrs;
-    fields = fields.concat(Object.keys(PFConst.abilityScoreManualDropdowns));
-    fields = fields.concat(_.values(PFConst.abilityScoreManualDropdowns));
-    //TAS.debug("propagateAbilityModsAsync about to get fields:",fields);
-    getAttrs(fields,function(v){
+    },
+    attrs = abilitymods;
+    attrs = attrs.concat(Object.keys(PFConst.abilityScoreManualDropdowns));
+    attrs = attrs.concat(_.values(PFConst.abilityScoreManualDropdowns));
+    getAttrs(attrs,function(v){
         var  setter, params ={};
         //TAS.debug("propagateAbilityModsAsync, returned with ",v);
-        setter= attrs.reduce(function(m,a){
-            var l;
-            newval = newval||parseInt(v[attr],10)||0;
-            l=propagateAbilityMod(attr,newval,v);
-            _.extend(m,l);
-            return m;
+        setter= attrs.reduce(function(m,attr){
+            var l,newval=0;
+            newval = parseInt(v[attr],10)||0;
+            return propagateAbilityMod(attr,newval,v,m);
+            //_.extend(m,l);
+            //return m;
         },{});
         if(_.size(setter)){
             if (silently){
@@ -134,6 +123,39 @@ function propagateAbilityModsAsync(callback,silently,attr,newval,oldval){
             setAttrs(setter,params,done);
         } else {
             done();
+        }
+    });
+}
+
+
+/** Looks at the ability-mod changed and then updates rest of sheet. Both repeating and non repeating
+ * @param {string|Array} attr string name of attribute, or array of attributes abilitymods, if null then abilitymods
+ * @param {int} newval optional
+ * @param {int} oldval ignored
+ */
+function propagateAbilityDiffAsync(attr,newval,oldval){
+    var silently=false,  diff=0, fields;
+    TAS.debug("at propagateAbilityDiffAsync: attr:"+attr+", newval:"+newval+", oldval:"+oldval);
+    newval=newval||0;
+    oldval = oldval||0;
+    diff=newval-oldval;
+    if(diff===0){
+        return;
+    }
+    attr = attr.slice(0,3).toUpperCase()+'-mod';
+    fields = Object.keys(PFConst.abilityScoreManualDropdowns);
+    fields = fields.concat(_.values(PFConst.abilityScoreManualDropdowns));
+    PFAttacks.updateRepeatingWeaponAbilityDropdowns(attr,newval,oldval);
+    //TAS.debug("propagateAbilityDiffAsync about to get fields:",fields);
+    getAttrs(fields,function(v){
+        var  setter, params ={};
+        TAS.debug("propagateAbilityDiffAsync, returned with ",v);
+        setter=propagateAbilityMod(attr,newval,v);
+        if(_.size(setter)){
+            if (silently){
+                params = PFConst.silentParams;
+            }
+            setAttrs(setter,params);
         }
     });
 }
@@ -303,8 +325,14 @@ function setAllAbilityScoresAsync (callback, silently) {
  * @param {int} newVal new value of attrib
  * @param {int} oldVal old value of attrib
  */
-function updateAbilityScoreDiffAsync (callback, silently, attrib, newVal, oldVal){
-    var abilityName='',abilityMod='',attributes=[],attribType='';
+function updateAbilityScoreDiffAsync ( attrib, newVal, oldVal){
+    var abilityName='',abilityMod='',attributes=[],attribType='',silently=false,
+    done=function(){
+        if(typeof callback === "function"){
+            callback();
+        }
+    };
+    TAS.debug("at updateAbilityScoreDiffAsync: attrib:"+attrib+", newVal:"+newVal+", oldVal:"+oldVal);
     if(attrib.indexOf('-')>0){
         abilityName=attrib.slice(0,attrib.indexOf('-'));
         attribType=attrib.slice(attrib.indexOf('-')+1);
@@ -313,15 +341,14 @@ function updateAbilityScoreDiffAsync (callback, silently, attrib, newVal, oldVal
             //also attrib will be 'total' or 'total_penalty'
             abilityName = abilityName.slice(5);
         }
+        abilityName=abilityName.toUpperCase();
+        TAS.debug("updateAbilityScoreDiffAsync: the ability name is "+abilityName +", from : "+attrib);
     } else {
         //should not happen if from user
         //we don't use this function for worksheet
-        if(typeof callback === "function") {
-            callback();
-        }
+        done();
         return;
     }
-    abilityName=abilityName.toUpperCase();
     abilityMod=abilityName+'-mod';
     attributes = [abilityName,abilityMod];
     attribType=attribType.toLowerCase();
@@ -336,11 +363,12 @@ function updateAbilityScoreDiffAsync (callback, silently, attrib, newVal, oldVal
         attributes.push(abilityName+'-modded');
     }
     getAttrs(attributes,function(v){
-        var setter={},currAbility=0,currMod=0,modded=0,diff=0,absdiff=0,newAbility=0,newMod=0,tempInt=0,params={};
+        var setter={},currAbility=0,currMod=0,modded=0,diff=0,absdiff=0,newAbility=0,newMod=0,tempInt=0,params={},
+        modUpdated=false;
         try{
             //if paralyzed or helpless, dont even bother updating str or dex
             currAbility=parseInt(v[abilityName],10);
-            if ( currAbility === 0 || 
+            if ( isNaN(currAbility) || currAbility < 2 || 
                 ((abilityName==='STR' ||abilityName==='DEX') && ((parseInt(v['condition-Paralyzed'],10)||0)===1)) ||
                 (abilityName==='DEX' && ((parseInt(v['condition-Helpless'],10)||0)===1)) ) {
                 if (typeof callback === "function"){
@@ -397,6 +425,7 @@ function updateAbilityScoreDiffAsync (callback, silently, attrib, newVal, oldVal
             }
             if(newMod!==currMod){
                 setter[abilityMod]=newMod;
+                modUpdated=true;
             } else {
                 silently=true;
             }
@@ -405,11 +434,11 @@ function updateAbilityScoreDiffAsync (callback, silently, attrib, newVal, oldVal
         } finally {
             if(_.size(setter)>0){
                 if(silently){
-                    params=PFConst.silentParams;
+                    params=PFonst.silentParams;                    
                 }
-                SWUtils.setWrapper(setter,params,callback);
-            } else if(typeof callback === "function") {
-                callback();
+                SWUtils.setWrapper(setter,params,done);
+            } else {
+                done();
             }
         }
     });
@@ -494,7 +523,7 @@ export var recalculate = TAS.callback(function callPFAbilityScoresRecalculate(ca
         }
     }),
     updateDependentAttrs = _.once(function(){
-        propagateAbilityModsAsync(done,silently);
+        propagateAllAbilityModsAsync(done,silently);
     }),
     updateScoresOnce = _.once(function () {
         setAllAbilityScoresAsync(updateDependentAttrs, silently);
@@ -506,25 +535,25 @@ export var recalculate = TAS.callback(function callPFAbilityScoresRecalculate(ca
 
 /** Calls 'on' function for everything related to this module */
 function registerEventHandlers () {
-
-    /** calls updateAbilityScoreDiffAsync if there is a change */
+    /** calls updateAbilityScoreDiffAsync if there is a change 
+     * when it's buffs, it just is blank for new or old, not 0
+    */
     var updateAbilityScoreDiffQuick =function(eventInfo){
-        var prev=parseInt(eventInfo.previousValue,10),
-            newv=parseInt(eventInfo.newValue,10);
+        var prev=parseInt(eventInfo.previousValue,10)||0,
+            newv=parseInt(eventInfo.newValue,10)||0;
         if(!isNaN(newv) && !isNaN(newv) && prev!==newv){
-            updateAbilityScoreDiffAsync(null,false,eventInfo.sourceAttribute,newv,prev);
+            updateAbilityScoreDiffAsync(eventInfo.sourceAttribute,newv,prev);
         }
     },
     /** calls propagateAbilityModsAsync if there is a change */
     updateAbilityScoreModQuick =function(eventInfo){
-        var prev=parseInt(eventInfo.previousValue,10),
-            newv=parseInt(eventInfo.newValue,10);
+        var prev=parseInt(eventInfo.previousValue,10)||0,
+            newv=parseInt(eventInfo.newValue,10)||0;
         if(!isNaN(newv) && !isNaN(newv) && prev!==newv){
-            propagateAbilityModsAsync(null,false,eventInfo.sourceAttribute,newv,prev);
+            propagateAbilityDiffAsync(eventInfo.sourceAttribute,newv,prev);
         }
     },
-
-     tempEventToWatch=abilities.map(function(ability){
+    tempEventToWatch=abilities.map(function(ability){
         return events.abilityEventsAuto.replace(/REPLACE/g, ability);
     }).join(' ');
 

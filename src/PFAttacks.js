@@ -1,11 +1,11 @@
 'use strict';
 import _ from 'underscore';
-import {PFLog, PFConsole} from './PFLog';
 import TAS from 'exports-loader?TAS!TheAaronSheet';
 import * as SWUtils from './SWUtils';
 import PFConst from './PFConst';
 import * as PFUtils  from './PFUtils';
 import * as PFUtilsAsync  from './PFUtilsAsync';
+import * as PFAbilityScores from './PFAbilityScores';
 import * as PFMacros from './PFMacros';
 import * as PFMigrate from './PFMigrate';
 import * as PFAttackOptions from './PFAttackOptions';
@@ -38,7 +38,7 @@ function getDamageMult(str){
 	var abilityMult=1;
 	if(str){
 		abilityMult= Number(String(str).replace(',','.'));
-		if (!abilityMult) { 
+		if (!abilityMult || isNaN(abilityMult)) { 
 			abilityMult =1;
 		}
 	}
@@ -187,15 +187,68 @@ function updateRepeatingWeaponDamageDiff(eventInfo,newval,oldval,callback){
 		});
 	}
 }
-export function updateRepeatingWeaponAbilityDropdowns(eventInfo,silently,ability){
+
+
+
+/** silently updates the damage dropdown and the total damage for each row based on update to the ability score
+ * sets new value then sets total with the difference
+ * @param {string} ability "STR-mod" etc updated
+ * @param {int} newval new value to set
+ * @param {int} oldval old value we should have already checked to be sure this is different than newval
+ */
+export function updateRepeatingWeaponAbilityDropdowns(ability,newval,oldval){
 	getSectionIDs("repeating_weapon", function (ids) {
-		_.each(ids,function(id){
-			PFUtilsAsync.setRepeatingDropdownValue("weapon", id, "damage-ability", "damage-ability-mod",
-			function(newval,oldval,changed){
-				if(changed){
-					updateRepeatingWeaponDamageDiff(eventInfo,newval,oldval);
+		var attribs ;
+		if(_.size(ids)<1){
+			done();
+			return;
+		}
+		attribs = SWUtils.cartesianAppend(['repeating_weapon_'],ids,['_damage-ability', '_damage-ability-mod','_total-damage','_damage_ability_mult','_damage-ability-max','_isranged']);
+		getAttrs(attribs,function(v){
+			var setter={},currval=0,dmgtotal=0,diff=0,rowdiff=0,rownew=0,maxA=999,abilityMult=1,idstochange=[],rangedAttack=false;
+			try {
+				diff=newval-oldval;
+				idstochange = _.filter(ids,function(id){
+					return (v['repeating_weapon_'+id+'_damage-ability']===ability);
+				});
+				_.each(idstochange,function(id){
+					try {
+						//check to make sure abiliy in row changed to stop infinite loops
+						currval=parseInt(v['repeating_weapon_'+id+'_damage-ability-mod'],10)||0;
+						if(currval!==newval){
+							setter['repeating_weapon_'+id+'_damage-ability-mod']=newval;
+							//check mult and max to see if we must modify diff
+							rowdiff=diff;
+							abilityMult=getDamageMult(v['repeating_weapon_'+id+'_damage_ability_mult'])||1;
+							if(abilityMult!==1){
+								rowdiff=diff*abilityMult;
+							}
+							rangedAttack=parseInt(v['repeating_weapon_'+id+'_isranged'],10)||0;
+							if(rangedAttack){
+								maxA = parseInt(v['repeating_weapon_'+id+'_damage-ability-max'], 10);
+								if(!isNaN(maxA) && maxA < rowdiff){
+									rowdiff=maxA;
+								}
+							}
+							rowdiff=Math.floor(rowdiff);
+							if(rowdiff !== diff){
+								//add diff to total
+								dmgtotal = parseInt(v['repeating_weapon_'+id+'_total-damage'],10)||0;
+								dmgtotal += rowdiff;
+								setter['repeating_weapon_'+id+'_total-damage']=dmgtotal;
+							}
+						}
+					} catch (err){
+						TAS.error("PFAttacks.updateRepeatingWeaponAbilityDropdowns Error calculating new value for row "+id,err);
+					}
+				});
+			} catch (err2){
+				TAS.error("PFAttacks.updateRepeatingWeaponAbilityDropdowns outer error ",err2);
+			} finally {
+				if(_.size(setter)>0){
+					SWUtils.setWrapper(setter,PFConst.silentParams);
 				}
-			},true);
+			}
 		});
 	});
 }
@@ -452,7 +505,7 @@ function getRecalculatedDamageOnly (id,v){
 			} else {
 				damageBuffs+=meleeBuffs;
 			}
-			abilityMult=getDamageMult(v[prefix+ "damage_ability_mult"]);
+			abilityMult=getDamageMult(v[prefix+ "damage_ability_mult"])||1;
 			damageBuffs -= dmgConditions;
 			abilityTotDmg = Math.floor(Math.min(abilityMult * abilitydmg, maxAbility));
 			newTotalDamage = abilityTotDmg + damageBuffs + dmgMacroMod + enhance;
@@ -624,7 +677,7 @@ function  getRecalculatedAttack (id,v,setter){
 			localsetter[prefix+"isranged"]=0;
 			isRanged=0;
 		}
-		abilityMult=getDamageMult(v[prefix+ "damage_ability_mult"]);
+		abilityMult=getDamageMult(v[prefix+ "damage_ability_mult"])||1;
 		if (isRanged){
 			damageBuffs +=  (v['buff_dmg_ranged-total']||0);
 			if(attkType.indexOf('2')>=0){
