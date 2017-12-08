@@ -191,7 +191,7 @@ function updateRepeatingWeaponDamageDiff(eventInfo,newval,oldval,callback){
 
 
 /** silently updates the damage dropdown and the total damage for each row based on update to the ability score
- * sets new value then sets total with the difference
+ * sets damage-ability-mod and total-damage
  * @param {string} ability "STR-mod" etc updated
  * @param {int} newval new value to set
  * @param {int} oldval old value we should have already checked to be sure this is different than newval
@@ -203,9 +203,9 @@ export function updateRepeatingWeaponAbilityDropdowns(ability,newval,oldval){
 			done();
 			return;
 		}
-		attribs = SWUtils.cartesianAppend(['repeating_weapon_'],ids,['_damage-ability', '_damage-ability-mod','_total-damage','_damage_ability_mult','_damage-ability-max','_isranged']);
+		attribs = SWUtils.cartesianAppend(['repeating_weapon_'],ids,['_damage-ability', '_total-damage','_damage_ability_mult','_damage-ability-max','_isranged']);
 		getAttrs(attribs,function(v){
-			var setter={},currval=0,dmgtotal=0,diff=0,rowdiff=0,rownew=0,maxA=999,abilityMult=1,idstochange=[],rangedAttack=false;
+			var setter={},dmgtotal=0,diff=0,rowdiff=0,rownew=0,maxA=999,abilityMult=1,idstochange=[],rangedAttack=false;
 			try {
 				diff=newval-oldval;
 				idstochange = _.filter(ids,function(id){
@@ -213,30 +213,26 @@ export function updateRepeatingWeaponAbilityDropdowns(ability,newval,oldval){
 				});
 				_.each(idstochange,function(id){
 					try {
-						//check to make sure abiliy in row changed to stop infinite loops
-						currval=parseInt(v['repeating_weapon_'+id+'_damage-ability-mod'],10)||0;
-						if(currval!==newval){
-							setter['repeating_weapon_'+id+'_damage-ability-mod']=newval;
-							//check mult and max to see if we must modify diff
-							rowdiff=diff;
-							abilityMult=getDamageMult(v['repeating_weapon_'+id+'_damage_ability_mult'])||1;
-							if(abilityMult!==1){
-								rowdiff=diff*abilityMult;
+						//assume that the diff is the same don't check damage-ability-mod
+						setter['repeating_weapon_'+id+'_damage-ability-mod']=newval;
+						rowdiff=diff;
+						abilityMult=getDamageMult(v['repeating_weapon_'+id+'_damage_ability_mult'])||1;
+						if(abilityMult!==1){
+							rowdiff=diff*abilityMult;
+						}
+						rangedAttack=parseInt(v['repeating_weapon_'+id+'_isranged'],10)||0;
+						if(rangedAttack){
+							maxA = parseInt(v['repeating_weapon_'+id+'_damage-ability-max'], 10);
+							if(!isNaN(maxA) && maxA < rowdiff){
+								rowdiff=maxA;
 							}
-							rangedAttack=parseInt(v['repeating_weapon_'+id+'_isranged'],10)||0;
-							if(rangedAttack){
-								maxA = parseInt(v['repeating_weapon_'+id+'_damage-ability-max'], 10);
-								if(!isNaN(maxA) && maxA < rowdiff){
-									rowdiff=maxA;
-								}
-							}
-							rowdiff=Math.floor(rowdiff);
-							if(rowdiff !== diff){
-								//add diff to total
-								dmgtotal = parseInt(v['repeating_weapon_'+id+'_total-damage'],10)||0;
-								dmgtotal += rowdiff;
-								setter['repeating_weapon_'+id+'_total-damage']=dmgtotal;
-							}
+						}
+						rowdiff=Math.floor(rowdiff);
+						if(rowdiff !== diff){
+							//add diff to total
+							dmgtotal = parseInt(v['repeating_weapon_'+id+'_total-damage'],10)||0;
+							dmgtotal += rowdiff;
+							setter['repeating_weapon_'+id+'_total-damage']=dmgtotal;
 						}
 					} catch (err){
 						TAS.error("PFAttacks.updateRepeatingWeaponAbilityDropdowns Error calculating new value for row "+id,err);
@@ -1746,9 +1742,10 @@ function registerEventHandlers () {
 			PFUtilsAsync.setRepeatingDropdownValue("weapon", null, "damage-ability", "damage-ability-mod",
 				function(newval,oldval,changed){
 					if(changed){
-						updateRepeatingWeaponDamageDiff(eventInfo,newval,oldval);
+						//cannot call "diff" cause of mult and max, until we make single row version of diff
+						updateRepeatingWeaponDamage(null,eventInfo);
 					}
-				},true);
+				});
 		}
 	}));
 	on("change:repeating_weapon:damage", TAS.callback(function eventRepeatingWeaponDamage(eventInfo) {
