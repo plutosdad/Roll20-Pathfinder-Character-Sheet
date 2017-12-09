@@ -172,7 +172,7 @@ export var recalculate = TAS.callback(function PFOccultRecalculate(callback,dumm
 
 on("change:create_kineticblast_macro",TAS.callback(function eventCreateKineticMacros(eventInfo){
     if(eventInfo.sourceType==="player"||eventInfo.sourceType==="api"){
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         getAttrs(['create_kineticblast_macro'],function(v){
             if(parseInt(v.create_kineticblast_macro,10)){
                 createAttackMacros(eventInfo);
@@ -183,7 +183,7 @@ on("change:create_kineticblast_macro",TAS.callback(function eventCreateKineticMa
 
 on("change:kineticist_level-mod change:kineticist_ability-mod",TAS.callback(function eventKineticistDC(eventInfo){
     if(eventInfo.sourceType==="sheetworker"||eventInfo.sourceType==="api"){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         updateDC(null,null,eventInfo);
     }
 }));
@@ -192,21 +192,21 @@ on("change:kineticist_level-mod change:kineticist_ability-mod",TAS.callback(func
 
 on("change:use_burn",TAS.callback(function eventUseBurn(eventInfo){
     if(eventInfo.sourceType==="player"||eventInfo.sourceType==="api"){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         recalculate();
     }
 }));
 
 on("change:create_kineticblast_attack",TAS.callback(function eventCreateKineticAttack(eventInfo){
     if(eventInfo.sourceType==="player"||eventInfo.sourceType==="api"){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         createAttack(eventInfo);
     }
 }));
 
 on("change:kineticistburn",TAS.callback(function eventUpdateBurn(eventInfo){
     if(eventInfo.sourceType==="player" || eventInfo.sourceType==="api"){
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         updateNLDamageFromBurn(eventInfo);
     }
 }));

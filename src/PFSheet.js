@@ -682,13 +682,13 @@ function registerEventHandlers () {
 		checkForUpdate();
 	}));
 	on("change:recalc1 change:migrate1", TAS.callback(function eventRecaluateSheet(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			checkForUpdate();
 		}
 	}));
 	on("change:expandall", function (eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			expandAll();
 		}
@@ -696,7 +696,7 @@ function registerEventHandlers () {
 
 	on("change:repeating_weapon:source-item", TAS.callback(function eventUpdateAttackSourceItem(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			getAttrs([eventInfo.sourceAttribute],function(v){
 				var weaponId = SWUtils.getRowId(eventInfo.sourceAttribute),
 				sourceId = v[eventInfo.sourceAttribute];
@@ -710,7 +710,7 @@ function registerEventHandlers () {
 	}));
 	on("change:repeating_weapon:source-ability", TAS.callback(function eventUpdateAttackSourceAbility(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			getAttrs([eventInfo.sourceAttribute],function(v){
 				var weaponId = SWUtils.getRowId(eventInfo.sourceAttribute),
 				sourceId = v[eventInfo.sourceAttribute];
@@ -722,7 +722,7 @@ function registerEventHandlers () {
 	}));
 	on("change:repeating_weapon:source-spell", TAS.callback(function eventUpdateAttackSourceSpell(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			getAttrs([eventInfo.sourceAttribute],function(v){
 				var weaponId = SWUtils.getRowId(eventInfo.sourceAttribute),
 				sourceId = v[eventInfo.sourceAttribute];
@@ -736,7 +736,7 @@ function registerEventHandlers () {
 	//delete a list
 	on("change:delete_repeating_spells change:delete_repeating_weapon change:delete_repeating_item change:delete_repeating_ability change:delete_repeating_mythic-feat change:delete_repeating_mythic-ability change:delete_repeating_buff change:delete_repeating_buff2 change:delete_repeating_trait change:delete_repeating_racial-trait change:delete_repeating_feat change:delete_repeating_class-ability change:delete_repeating_npc-spell-like-abilities",
 	TAS.callback(function eventDeleteOldList(eventInfo){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" ) {
 			getAttrs([eventInfo.sourceAttribute],function(v){
 				var section="";

@@ -446,14 +446,14 @@ function registerEventHandlers () {
 	on("change:customd1 change:customd2 change:customd3 change:customd4 change:customd5 change:customd6 change:customd1-name change:customd2-name change:customd3-name change:customd4-name change:customd5-name change:customd6-name",
 		TAS.callback(function customRollUpdate(eventInfo){
 			if(eventInfo.sourceType==='player'){
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				resetCommandMacro(eventInfo);
 			}
     }));
 	//show / hide extra fields
 	on("change:use_advanced_options", TAS.callback(function eventShowMisc(eventInfo){
 		if(eventInfo.sourceType==='player'||eventInfo.sourceType==='api'){
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			getAttrs(['use_advanced_options'],function(v){
 				if(parseInt(v.use_advanced_options,10)){
 					showMiscFields();
@@ -467,7 +467,7 @@ function registerEventHandlers () {
 	_.each(PFConst.abilityScoreManualDropdowns, function (write, read) {
 		on("change:" + read, TAS.callback(function eventManualDropdown(eventInfo) {
 			if (eventInfo.sourceType==="player" || eventInfo.sourceType==="api"){
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				//user changed the SELECTION
 				PFUtilsAsync.setDropdownValue(read, write);
 			}
@@ -477,20 +477,20 @@ function registerEventHandlers () {
 	//GENERIC EQUATIONS
 	_.each(PFConst.equationMacros, function (write, read) {
 		on("change:" + read, TAS.callback(function eventGenericEquationMacro(eventInfo) {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			SWUtils.evaluateAndSetNumber(read, write);
 		}));
 	});
 
 	_.each(PFConst.customEquationMacros,function(writeField,custField){
 		on('change:'+custField,TAS.callback(function customEquationMacro(eventInfo){
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);		
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);		
 			SWUtils.evaluateAndAddAsync(null,null,custField,writeField,'buff_'+custField+'-total');		
 		}));
 	});
 	on("change:kineticist_level", TAS.callback(function eventKineticistLevel(eventInfo){
 		if(eventInfo.sourceType==='player'){
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			PFUtilsAsync.setDropdownValue('kineticist_level', 'kineticist_level-mod');
 		}
 	}));

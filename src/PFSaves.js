@@ -94,7 +94,7 @@ function registerEventHandlers () {
 		var eventToWatch = events.saveEventsAuto.replace(/REPLACE/g, save);
 		on(eventToWatch, TAS.callback(function eventUpdateSaveAuto(eventInfo) {
 			if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + save + ": " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + save + ": " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				updateSave(save, eventInfo);
 			}
 		}));
@@ -103,7 +103,7 @@ function registerEventHandlers () {
 		var eventToWatch = events.saveEventsPlayer.replace(/REPLACE/g, save);
 		on(eventToWatch, TAS.callback(function eventUpdateSavePlayer(eventInfo) {
 			if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + save + ": " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + save + ": " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				updateSave(save, eventInfo);
 			}
 		}));

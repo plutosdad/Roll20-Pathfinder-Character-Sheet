@@ -60,7 +60,7 @@ export function registerEventHandlers() {
         var eventToWatch = "change:repeating_" + section + ":ids-show";
         on(eventToWatch, TAS.callback(function eventCheckIsNewRow(eventInfo) {
             var setter={},id;
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
                 id = SWUtils.getRowId(eventInfo.sourceAttribute);
                 setter["repeating_" + section + "_"+id+"_row_id"]=id;

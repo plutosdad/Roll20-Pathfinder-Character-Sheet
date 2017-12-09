@@ -174,7 +174,7 @@ function registerEventHandlers () {
     _.each(optionToggles, function (toggleField) {
         on("change:" + toggleField, TAS.callback(function toggleAttackNoteOption(eventInfo) {
             if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                 resetOptions(null,eventInfo);
             }
         }));
@@ -184,7 +184,7 @@ function registerEventHandlers () {
         var eventToWatch = "change:repeating_weapon:" + fieldToWatch;
         on(eventToWatch, TAS.callback(function eventUpdateAttackTypeOptionSheet(eventInfo) {
             if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
-                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                 resetOption(null, eventInfo);
             }
         }));
@@ -193,7 +193,7 @@ function registerEventHandlers () {
         var eventToWatch = "change:repeating_weapon:" + fieldToWatch;
         on(eventToWatch, TAS.callback(function eventUpdateAttackTypeOptionPlayer(eventInfo) {
             if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                 resetOption(null, eventInfo);
             }
         }));

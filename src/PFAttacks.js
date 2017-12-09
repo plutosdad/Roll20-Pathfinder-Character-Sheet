@@ -1697,7 +1697,7 @@ export var recalculate = TAS.callback(function callPFAttacksRecalculate(callback
 });
 function registerEventHandlers () {
 	on("change:repeating_weapon:attack-type", TAS.callback(function eventHandleRepeatingAttackDropdown(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			//should do this every time api is used due to loops we can't eliminate:
 			//if (eventInfo.previousValue !== eventInfo.newValue){
@@ -1716,7 +1716,7 @@ function registerEventHandlers () {
 		}
 	}));
 	on("change:repeating_weapon:attack", TAS.callback(function eventRepeatingWeaponAttack(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		SWUtils.evaluateAndSetNumber("repeating_weapon_attack", "repeating_weapon_attack-mod",0,
 			function(newval,oldval,changed){
 				if(changed){
@@ -1726,18 +1726,18 @@ function registerEventHandlers () {
 	}));
 	on("change:repeating_weapon:attack-type-mod change:repeating_weapon:attack-mod", TAS.callback(function eventUpdateRepeatingWeaponAttackSheet(eventInfo) {
 		if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			updateRepeatingWeaponAttackAsync(null, eventInfo);
 		}
 	}));
 	on("change:repeating_weapon:masterwork change:repeating_weapon:proficiency", TAS.callback(function eventUpdateRepeatingWeaponAttackPlayer(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			updateRepeatingWeaponAttackAsync(null, eventInfo);
 		}
 	}));
 	on("change:repeating_weapon:damage-ability", TAS.callback(function eventHandleRepeatingDamageDropdown(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			PFUtilsAsync.setRepeatingDropdownValue("weapon", null, "damage-ability", "damage-ability-mod",
 				function(newval,oldval,changed){
@@ -1749,7 +1749,7 @@ function registerEventHandlers () {
 		}
 	}));
 	on("change:repeating_weapon:damage", TAS.callback(function eventRepeatingWeaponDamage(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		SWUtils.evaluateAndSetNumber("repeating_weapon_damage", "repeating_weapon_damage-mod",0,
 			function(newval,oldval,changed){
 				if(changed){
@@ -1759,24 +1759,24 @@ function registerEventHandlers () {
 	}));
 	on("change:repeating_weapon:damage_ability_mult", TAS.callback(function eventUpdateRepeatingWeaponDamagePlayer(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			updateRepeatingWeaponDamage(null, eventInfo);
 		}
 	}));
 	on("change:repeating_weapon:damage-ability-max", TAS.callback(function eventUpdateRepeatingWeaponDamageMaxPlayer(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			updateRepeatingWeaponDamage(null, eventInfo);
 		}
 	}));
 	on("change:repeating_weapon:damage-ability-mod change:repeating_weapon:damage-mod", TAS.callback(function eventUpdateRepeatingWeaponDamageSheet(eventInfo) {
 		if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			updateRepeatingWeaponDamage(null, eventInfo);
 		}
 	}));
 	on("change:repeating_weapon:enhance", TAS.callback(function eventUpdateRepeatingWeaponAttackAndDamage(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			updateRepeatingWeaponAttackAsync(null, eventInfo);
 			updateRepeatingWeaponDamage();
@@ -1784,21 +1784,21 @@ function registerEventHandlers () {
 	}));
 	on("change:repeating_weapon:crit_confirm ", TAS.callback(function eventWeaponCritConfirmBonus(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			updateRepeatingWeaponCritAsync(null, eventInfo);
 		}
 	}));
 	_.each(PFAttackGrid.attackGridFields, function (attackFields, attack) {
 		on("change:" + attackFields.crit, TAS.callback(function eventAttackCrit(eventInfo) {
 			if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				updateRepeatingWeaponsFromCritAsync(attack, eventInfo);
 			}
 		}));
 
 		on("change:" + attackFields.atk, TAS.callback(function eventAttackUpdate(eventInfo) {
 			if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				TAS.debug("Yeah baby!");
 				//recalculateRepeatingWeapons();
 				updateRepeatingAttacks(eventInfo.sourceAttribute);
@@ -1810,37 +1810,37 @@ function registerEventHandlers () {
 
 	on("change:repeating_weapon:default_damage-dice-num change:repeating_weapon:default_size change:repeating_weapon:default_damage-die change:repeating_weapon:size_affects", TAS.callback(function eventWeaponDice(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			adjustDamageDiceAsync();
 		}
 	}));
 	on("change:repeating_weapon:damage-dice-num change:repeating_weapon:damage-die", TAS.callback(function eventWeaponDice(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			syncDefaultDamageDiceAsync();
 		}
 	}));
 	on("remove:repeating_weapon change:repeating_weapon:attack-type change:_reporder_repeating_weapon change:repeating_weapon:group change:repeating_weapon:name change:include_attack_totals", TAS.callback(function eventRepeatingWeaponChange(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			PFAttackGrid.resetCommandMacro();
 		}
 	}));
 	on("remove:repeating_weapon", TAS.callback(function eventUpdateRepeatingWeaponAttackPlayer(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			removeLinkedAttack(null, linkedAttackType.weapon , SWUtils.getRowId(eventInfo.sourceAttribute));
 		}
 	}));
 	on("change:create_twoweapon_attack", TAS.callback(function eventCreateTwoWeaponAttack(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			createDualWieldAsync();
 		}
 	}));
 	on("change:update_twoweapon_attack", TAS.callback(function eventUpdateDualWield(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			updateDualWieldAttacks(null,eventInfo);
 		}
 	}));

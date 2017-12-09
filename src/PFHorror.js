@@ -84,20 +84,20 @@ export var recalculate = TAS.callback(function PFHorrorRecalculate(callback){
 function registerEventHandlers () {
  	on("change:sanity_score_misc-mod change:WIS change:INT change:CHA change:buff_WIS-total_penalty change:buff_INT-total_penalty change:buff_CHA-total_penalty",
         TAS.callback(function eventAllMentalStatsAutoUpdate(eventInfo){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if(eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api" ) {
             setSanityScore();
 		}
 	}));   
  	on("change:WIS-damage change:INT-damage change:CHA-damage change:WIS-penalty change:INT-penalty change:CHA-penalty",
         TAS.callback(function eventAllMentalStatsPlayerUpdate(eventInfo){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if(eventInfo.sourceType === "player" || eventInfo.sourceType === "api" ) {
             setSanityScore();
 		}
 	}));   
  	on("change:sanity-ability-mod change:sanity_threshold_misc-mod",TAS.callback(function eventThresholdUpdate(eventInfo){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if(eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api" ) {
             setSanityThreshold();
 		}

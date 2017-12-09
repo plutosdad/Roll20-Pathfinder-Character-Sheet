@@ -640,7 +640,7 @@ function registerEventHandlers () {
     _.each(PFConst.spellClassIndexes, function (spellClassIdx) {
         var numberIdx = parseInt(spellClassIdx, 10) || 0;
         on("change:Concentration-" + numberIdx + "-ability", TAS.callback(function eventChangeSpellDropdown(eventInfo) {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             PFUtilsAsync.setDropdownValue("Concentration-" + numberIdx + "-ability", "Concentration-" + numberIdx + "-mod");
         }));
         _.each(events.spellcastingClassEventsPlayer, function (functions, event) {
@@ -648,7 +648,7 @@ function registerEventHandlers () {
             _.each(functions, function (methodToCall) {
                 on(eventToWatch, TAS.callback(function eventSpellcasterClassSpecificUpdatePlayerOnly(eventInfo) {
                     if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-                        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                         ifSpellClassExists(numberIdx, function () {
                             methodToCall(numberIdx, eventInfo);
                         });
@@ -661,7 +661,7 @@ function registerEventHandlers () {
             _.each(functions, function (methodToCall) {
                 on(eventToWatch, TAS.callback(function eventSpellcasterClassSpecificUpdateAuto(eventInfo) {
                     if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
-                        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                         ifSpellClassExists(numberIdx, function () {
                             methodToCall(numberIdx, eventInfo);
                         });
@@ -674,7 +674,7 @@ function registerEventHandlers () {
             var eventToWatch = event.replace(/REPLACE/g, numberIdx);
             _.each(functions, function (methodToCall) {
                 on(eventToWatch, TAS.callback(function eventSpellcasterClassUpdate(eventInfo) {
-                    TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                    TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                     methodToCall(numberIdx, eventInfo);
                 }));
             });
@@ -684,7 +684,7 @@ function registerEventHandlers () {
             var spellNumber = parseInt(spellLevel, 10),
             eventToWatch = events.spellcastingClassEventsPerSpellLevel.replace(/CLASSIDX/g, numberIdx).replace(/SPELLLEVEL/g, spellNumber);
             on(eventToWatch, TAS.callback(function eventSpellsPerDay(eventInfo) {
-                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                 ifSpellClassExists(numberIdx, function () {
                     updateMaxSpellsPerDay(numberIdx, spellNumber);
                 });
@@ -692,7 +692,7 @@ function registerEventHandlers () {
         });
         on("change:spellclass-0-exists change:spellclass-1-exists change:spellclass-2-exists",TAS.callback(function eventSpellClassExists(eventInfo){
             if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
-                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                 udpateAllSpellMenu(null,eventInfo);
             }
         }));

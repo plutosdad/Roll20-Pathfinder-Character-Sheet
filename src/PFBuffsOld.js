@@ -577,13 +577,13 @@ function registerEventHandlers () {
 		var prefix = "change:repeating_buff:buff-" + col ;
 		if (col!=='size'){
 			on(prefix + "_macro-text", TAS.callback(function eventBuffMacroText(eventInfo) {
-				TAS.debug("caught " + eventInfo.sourceAttribute + " for column " + col + ", event: " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " for column " + col + ", event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				setBuff(null, col);
 			}));
 		}
 		on(prefix + "-show", TAS.callback(function PFBuffs_updateBuffRowShowBuff(eventInfo) {
 			if (eventInfo.sourceType === "player" || eventInfo.sourceType ==="api") {
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				TAS.debug("we updated "+col+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 				getAttrs(['repeating_buff_buff-'+col,'repeating_buff_buff-enable_toggle'],function(v){
 					if (parseInt(v['repeating_buff_buff-enable_toggle'],10) && parseInt(v['repeating_buff_buff-'+col],10) ) {
@@ -597,12 +597,12 @@ function registerEventHandlers () {
 	//size is special users modify it via dropdown - no macro
 	on("change:repeating_buff:buff-size", TAS.callback(function PFBuffs_updateBuffSize(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType ==="api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			updateBuffTotalAsync('size');
 		}
 	}));
 	on("remove:repeating_buff", TAS.callback(function PFBuffs_removeBuffRow(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player") {
 			updateAllBuffTotalsAsync();
 		}
@@ -610,7 +610,7 @@ function registerEventHandlers () {
 	on("change:repeating_buff:buff-enable_toggle", TAS.callback(function PFBuffs_enableBuffRow(eventInfo) {
 		var fields;
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType ==="api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			fields = buffColumns.map(function(col){return 'repeating_buff_buff-'+col;});
 			fields = fields.concat(fields.map(function(row){return row+'-show';}));
 			getAttrs(fields,function(v){

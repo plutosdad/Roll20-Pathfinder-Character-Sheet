@@ -272,14 +272,14 @@ function registerEventHandlers  () {
             return "change:class-" + row + "-" + col;
         }).join(" ");
         on(eventsToWatch, TAS.callback(function eventTotalClassInformation(eventInfo) {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" ) {
                 updateClassInformation(col, null, null, eventInfo);
             }
         }));
         if (col === "level") {
             on(eventsToWatch, TAS.callback(function eventTotalClassInformationLevel(eventInfo) {
-                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                 if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
                     updateClassInformation("skill", null, null, eventInfo);
                     setMulticlassed();
@@ -289,7 +289,7 @@ function registerEventHandlers  () {
     });
     _.each(raceColumns, function (col) {
         on("change:npc-" + col, TAS.callback(function eventUpdateRacialRow(eventInfo) {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" || (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api" && eventInfo.sourceAttribute.slice(-2)==='hp')) {
                 if (col === 'hd-num') {
                     updateClassInformation('level', null, null, eventInfo);
@@ -304,7 +304,7 @@ function registerEventHandlers  () {
     _.each(classRows,function(row){
         tempString = events.perClassRowhp.replace(/REPLACE/g,row);
         on(tempString,TAS.callback(function eventUpdateClassHitPoints(eventInfo){
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
                 setHitPoints(null,null,eventInfo);
                 //can we move this to spells? or keep here
@@ -316,7 +316,7 @@ function registerEventHandlers  () {
         }));
     });
     on(events.racialhp,TAS.callback(function eventUpdateRacialHitPoints(eventInfo){
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             setHitPoints(null,null,eventInfo);
             if (eventInfo.sourceAttribute === "npc-hd-num"){
@@ -325,7 +325,7 @@ function registerEventHandlers  () {
         }
     }));
     on(events.basehp,TAS.callback(function eventHPAutoCalcSwitches(eventInfo){
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             setHitPoints();					
         }
@@ -333,7 +333,7 @@ function registerEventHandlers  () {
     on("change:class-0-level change:class-1-level change:class-2-level change:class-3-level change:class-4-level change:class-5-level change:bab change:level",TAS.callback(function eventUpdateLevel(eventInfo){
         if (((eventInfo.sourceAttribute==='level' || eventInfo.sourceAttribute==='bab') && eventInfo.sourceType === "sheetworker") ||
          eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             _.each(PFConst.levelPlusBABManualDropdowns,function(attr){
                 SWUtils.setDropdownValue(attr,attr+'-mod');
             });

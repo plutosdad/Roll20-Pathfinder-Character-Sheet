@@ -1,7 +1,6 @@
 'use strict';
 import _ from 'underscore';
 import TAS from 'exports-loader?TAS!TheAaronSheet';
-import {PFLog, PFConsole} from './PFLog';
 import PFConst from './PFConst';
 import * as SWUtils from './SWUtils';
 import * as PFUtils from './PFUtils';
@@ -553,59 +552,54 @@ export function updateAllSkillsDiff (newmod,oldmod){
 		SWUtils.setWrapper(setter,PFConst.silentParams);
 	});
 }
-
-export function recalculateAbilityBasedSkills (abilityBuff,eventInfo,callback,silently){
-	var done=function(){
-		if (typeof callback === "function"){ callback();}
-	},
-	updatedAttr ,tempstr='',matches,fields;
-	if(abilityBuff) {
-		tempstr = abilityBuff;
-	} else if(eventInfo){
-		tempstr = eventInfo.sourceAttribute;
-		if(tempstr.indexOf('repeating_')>=0){
-			tempstr = SWUtils.getAttributeName(tempstr);
-		}
-	}
-
-	if(tempstr){
-		if (tempstr==='physical'||tempstr==='acp'){
-			updatedAttr = /STR\-mod|DEX\-mod/;
-		} else {
-			matches=tempstr.match(/str|dex|con|int|wis|cha/i);
-			if(matches){
-				//TAS.debug("recalculateAbilityBasedSkills the match is: "+matches[0],matches);
-				updatedAttr= new RegExp(matches[0].toUpperCase()+'\-mod');
-			}
-		}
-		//TAS.debug("recalculateAbilityBasedSkills updatedAttr is now "+updatedAttr);
-	}
-	if(!updatedAttr){
-		done();
-		return;			
-	}
-	fields = allTheSkills.map(function(skill){
+/**
+ * 
+ * @param {string} abilityMod STR-mod etc
+ * @param {int} newmod newvalue
+ * @param {int} oldmod oldvalue
+ */
+export function updateAbilitySkillsDiff (abilityMod,newmod,oldmod){
+	TAS.notice("PFSkills.updateAbilitySkillsDiff updating by " +newmod+", from "+ oldmod);
+	var fields = allTheSkills.concat(_.map(allTheSkills,function(skill){
 		return skill+'-ability';
-	});
-	//TAS.debug("recalculateAbilityBasedSkills getting all skill abilities");
+	}));
 	getAttrs(fields,function(v){
-		var skillArray=[];
-		//TAS.debug("recalculateAbilityBasedSkills skill abilities are ",fields,v);
-		skillArray = _.reduce(v,function(m,val,field){
-			if(updatedAttr.test(val)){
-				//TAS.debug("recalculateAbilityBasedSkills field "+field+" matches and skill is "+ field.slice(0,-8));
-				m.push(field.slice(0,-8));
-			}
-			return m;
-		},[]);
-		TAS.notice("PFSkills updateAbilityBasedSkills getting array:",skillArray);
-		if(_.size(skillArray)){
-			recalcSkillTotals(skillArray,done,silently);
+		var diff = newmod - oldmod,setter={};
+		if(abilityMod!=='physical'){
+			setter= _.reduce(allTheSkills,function(m,skill){
+				var a=0;
+				if(v[skill+'-ability']===abilityMod){
+					m[skill]= ( (parseInt(v[skill],10)||0)+diff );
+				}
+				return m;
+			},{});
 		} else {
-			done();
+			setter= _.reduce(allTheSkills,function(m,skill){
+				var a=0;
+				if(v[skill+'-ability']==='DEX-Mod'||v[skill+'-ability']==='STR-Mod'){
+					m[skill]= ( (parseInt(v[skill],10)||0)+diff );
+				}
+				return m;
+			},{});
+		}
+
+		if(_.size(setter)){
+			SWUtils.setWrapper(setter,PFConst.silentParams);
 		}
 	});
 }
+
+export function updateAbilityBasedSkillsDiffFromBuff(attr,eventInfo){
+	var prevv=0,newv=0;
+	prev=parseInt(eventInfo.previousValue,10)||0;
+	newv=parseInt(eventInfo.newValue,10)||0;
+	attr = attr.slice(0,3).toUpperCase() + '-mod';
+	
+	if( prev!==newv){
+		updateAbilitySkillsDiff(attr,newv,prevv);
+	}
+}
+
 /** updates the macros for only the 7 subskill rolltemplates 
  * @param {boolean} background -if background skills turned on
  * @param {boolean} rt - if Enforce Requires Training checked 
@@ -1004,30 +998,30 @@ export var recalculate = TAS.callback(function PFSkillsRecalculate(callback, sil
 	}, oldversion);
 });
 function registerEventHandlers () {
-	on("change:str-mod change:dex-mod change:con-mod change:int-mod change:wis-mod change:cha-mod",TAS.callback(function eventAbilityScoreToSkill(eventInfo){
-		TAS.notice("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
-		if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
-			recalculateAbilityBasedSkills(null,eventInfo);
-		}
-	}));
+
 	//SKILLS************************************************************************
 	on("change:total-skill change:total-fcskill change:int-mod change:level change:max-skill-ranks-mod change:unchained_skills-show change:BG-Skill-Use", TAS.callback(function eventUpdateMaxSkills(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
 			updateMaxSkills(eventInfo);
 		}
 	}));
 	on(events.skillGlobalPhysEventAuto, TAS.callback(function eventGlobalConditionAffectingSkill(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + eventInfo.sourceType);
+		var prevv=0,newv=0;
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
-			recalculateAbilityBasedSkills('physical',eventInfo);
+			prev=parseInt(eventInfo.previousValue,10)||0;
+            newv=parseInt(eventInfo.newValue,10)||0;
+	        if( prev!==newv){
+				updateAbilitySkillsDiff('physical',newv,prevv);
+			}
 		}
-	}));		
+	}));
 	//each skill has a dropdown handler and a skill update handler
 	//concat them all up, only happens once so no big deal
 	_.each(allTheSkills, function (skill) {
 		on((events.skillEventsAuto.replace(/REPLACE/g, skill)), TAS.callback(function eventSkillsAuto(eventInfo) {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + skill + ", " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + skill + ", " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
 				verifyHasSkill(skill, function (hasSkill) {
 					if (hasSkill) {
@@ -1037,19 +1031,19 @@ function registerEventHandlers () {
 			}
 		}));
 		on((events.skillEventsPlayer.replace(/REPLACE/g, skill)), TAS.callback(function eventSkillsPlayer(eventInfo) {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + skill + ", " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + skill + ", " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 				updateSkillAsync(skill);
 			}
 		}));
 		on("change:" + skill + "-misc", TAS.callback(function eventSkillMiscFieldUpdate(eventInfo) {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			//updateMiscAndSkillValAsync(skill);
 			TAS.debug("calling evalute for "+skill);
 			SWUtils.evaluateAndAddToTotAsync(null,null,skill+'-misc',skill+'-misc-mod',skill);
 		}));
 		on("change:" + skill + "-cs", TAS.callback(function eventClassSkillCheckbox(eventInfo) {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 				updateSkillByClassChkAsync(skill);
 			}
@@ -1058,7 +1052,7 @@ function registerEventHandlers () {
 		//these always displayed if rt or not
 		if (skill.slice(0, 9) !== "Knowledge" && skill !== "Linguistics" && skill !== "Sleight-of-Hand") {
 			on("change:" + skill + "-ReqTrain change:" + skill + "-ranks", TAS.callback(function eventSkillRequiresTrainingRanks(eventInfo) {
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + skill + ", " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + skill + ", " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 					getAttrs(["enforce_requires_training"], function (v) {
 						if (parseInt(v.enforce_requires_training,10)) {
@@ -1075,13 +1069,13 @@ function registerEventHandlers () {
 		if (mult === 1) {
 			on("change:size_skill", TAS.callback(function eventUpdateSizeSkill(eventInfo) {
 				if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
-					TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+					TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 					updateSkillAsync(skill);
 				}
 			}));
 		} else if (mult === 2) {
 			on("change:size_skill_double", TAS.callback(function eventUpdateSizeSkillDouble(eventInfo) {
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
 					updateSkillAsync(skill);
 				}
@@ -1090,14 +1084,14 @@ function registerEventHandlers () {
 	});
 	on("change:enforce_requires_training", TAS.callback(function eventRequiresTraining(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			resetCommandMacro(eventInfo);
 		}
 	}));
 	_.each(SWUtils.cartesianAppend(allFillInSkillInstances, ["-name"]), function (skill) {
 		on("change:" + skill, TAS.callback(function eventSkillsWithFillInNames(eventInfo) {
 			if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				var rt = skill.slice(0, -4) + "ReqTrain",
 				r = skill.slice(0, -4) + "ranks";
 				//if we changed name on a skill that isn't choosable don't bother.
@@ -1117,7 +1111,7 @@ function registerEventHandlers () {
 	});
 	//reset based on config changes
 	on("change:unchained_skills-show change:BG-Skill-Use change:include_skill_totals", TAS.callback(function eventResetUnchainedSkills(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			recalculate(eventInfo, function(){resetCommandMacro(eventInfo);});
 		}

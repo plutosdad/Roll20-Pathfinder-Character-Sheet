@@ -1619,13 +1619,13 @@ export var recalculate = TAS.callback(function PFInventoryRecalculate(callback, 
 function registerEventHandlers  () {
     var tempstr="";
     on('change:repeating_item:item-category_compendium', TAS.callback(function EventItemCompendium(eventInfo){
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             importFromCompendium(eventInfo);
         }
     }));
     on('change:repeating_item:location', TAS.callback(function eventUpdateItemLocation(eventInfo){
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             getAttrs(['repeating_item_location','repeating_item_old_location'],function(v){
                 var newLoc=parseInt(v.repeating_item_location,10),oldLoc=parseInt(v.repeating_item_old_location,10);
@@ -1644,7 +1644,7 @@ function registerEventHandlers  () {
     }));
     on('change:repeating_item:qty_max', TAS.callback(function eventUpdateItemMaxQty(eventInfo){
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             updateRepeatingItems();
             getAttrs(['repeating_item_qty_max'],function(v){
                 if(parseInt(v['repeating_item_qty_max'],10) > 1){
@@ -1657,7 +1657,7 @@ function registerEventHandlers  () {
     }));
     on('change:repeating_item:qty', TAS.callback(function eventUpdateItemTotalQty(eventInfo) {
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             getAttrs(['repeating_item_qty_max'],function(v){
                 var qtymax=parseInt(v.repeating_item_qty_max,10)||0;
                 if (qtymax ===0 || qtymax === 1){
@@ -1668,20 +1668,20 @@ function registerEventHandlers  () {
     }));
     //hp total removed
     //on('change:repeating_item:item-hp change:repeating_item:item-hp_max', TAS.callback(function eventUpdateItemTotalHp(eventInfo) {
-    //    TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+    //    TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
     //    if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
     //        updateRepeatingItems(null,true,{'hp':1});
     //    }
     //}));
     on('change:repeating_item:value', TAS.callback(function eventUpdateItemTotalValue(eventInfo) {
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             updateRepeatingItems(null,true,{'value':1});
         }
     }));
     on('change:repeating_item:item-weight', TAS.callback(function eventUpdateItemTotalWeight(eventInfo) {
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             getAttrs(['repeating_item_location'],function(v){
                 if (parseInt(v.repeating_item_location,10)!==locationMap.NotCarried){
                     updateRepeatingItems(null,false,{'weight':1});
@@ -1692,7 +1692,7 @@ function registerEventHandlers  () {
 
     on('remove:repeating_item', TAS.callback(function eventRemoveItem(eventInfo) {
         var source='',setter = {}, itemId ='';
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             updateRepeatingItems();
             deleteWornRow(eventInfo.sourceAttribute);
@@ -1700,17 +1700,17 @@ function registerEventHandlers  () {
         PFAttacks.removeLinkedAttack(null, PFAttacks.linkedAttackType.equipment , SWUtils.getRowId(eventInfo.sourceAttribute));
     }));
     on('change:CP change:SP change:GP change:PP', TAS.callback(function eventUpdateCarriedCurrency(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         updateCarriedCurrency();
     }));
     on('change:carried-currency change:item_total_weight change:carried-misc', TAS.callback(function eventUpdateCarriedTotal(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         updateCarriedTotal();
     }));
     //change item worn in shield or armor location
     on('change:repeating_item:item-defense-type change:repeating_item:item-acbonus change:repeating_item:item-max-dex change:repeating_item:item-acp change:repeating_item:item-spell-fail change:repeating_item:item-proficiency change:repeating_item:acenhance', TAS.callback(function eventUpdateEquippedArmorOrShield(eventInfo) {
             var location = 0;
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             getAttrs(["repeating_item_location"], function (v) {
                 var location = parseInt(v["repeating_item_location"], 10) || 0;
                 if (location === locationMap.Armor || location === locationMap.Shield){
@@ -1721,26 +1721,26 @@ function registerEventHandlers  () {
     _.each(commonLinkedAttributes, function (fieldToWatch) {
         var eventToWatch = "change:repeating_item:item-" + fieldToWatch;
         on(eventToWatch, TAS.callback(function eventupdateAssociatedAttackLoop(eventInfo) {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
                 updateAssociatedAttack(eventInfo.sourceAttribute);
             }
         }));
     });
     on('change:repeating_item:name change:repeating_item:item-dmg-type change:repeating_item:item-proficiency change:repeating_item:default_size change:repeating_item:wpenhance', TAS.callback(function eventupdateAssociatedAttack(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             updateAssociatedAttack(eventInfo.sourceAttribute);
         }
     }));
     on("change:repeating_item:create-attack-entry", TAS.callback(function eventcreateAttackEntryFromRow(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             createAttackEntryFromRow( null,null,false,eventInfo);
         }
     }));
     on("change:repeating_item:set-as-armor", TAS.callback(function eventcreateArmorEntryFromRow(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             updateWornArmorAndShield(locationMap.Armor,eventInfo.sourceAttribute,function(){
                 updateEquipmentLocation(null,null,null,eventInfo);
@@ -1748,7 +1748,7 @@ function registerEventHandlers  () {
         }
     }));
     on("change:repeating_item:set-as-shield", TAS.callback(function eventcreateShieldEntryFromRow(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             updateWornArmorAndShield(locationMap.Shield,eventInfo.sourceAttribute,function(){
                 updateEquipmentLocation(null,null,null,eventInfo);
@@ -1756,13 +1756,13 @@ function registerEventHandlers  () {
         }
     }));
     on("change:repeating_item:showinmenu change:repeating_item:equip-type change:repeating_item:name", TAS.callback(function eventShowItemInMenu(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             resetCommandMacro( );
         }
     }));
     on("change:repeating_item:equip-type", TAS.callback(function eventItemEquipTypeChange(eventInfo){
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             getAttrs(['repeating_item_equip-type','repeating_item_equiptype-tab','equipment_tab'],function(v){
                 var newtype=parseInt(v['repeating_item_equip-type'],10)||0,

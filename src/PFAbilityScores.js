@@ -5,6 +5,7 @@ import * as SWUtils from './SWUtils';
 import PFConst from './PFConst';
 import * as PFUtils from './PFUtils';
 import * as PFAttacks from './PFAttacks';
+import * as PFSkills from './PFSkills';
 
 export var abilities = ["STR", "DEX", "CON", "INT", "WIS", "CHA"],
 abilitymods = ["STR-mod", "DEX-mod", "CON-mod", "INT-mod", "WIS-mod", "CHA-mod"];
@@ -130,22 +131,18 @@ function propagateAllAbilityModsAsync(callback,silently){
 
 /** Looks at the ability-mod changed and then updates rest of sheet. Both repeating and non repeating
  * @param {string|Array} attr string name of attribute, or array of attributes abilitymods, if null then abilitymods
- * @param {int} newval optional
- * @param {int} oldval ignored
+ * @param {int} newval newvalue of modifier
+ * @param {int} oldval oldvalue of modifier
  */
 function propagateAbilityDiffAsync(attr,newval,oldval){
     var silently=false,  diff=0, fields;
     TAS.debug("at propagateAbilityDiffAsync: attr:"+attr+", newval:"+newval+", oldval:"+oldval);
-    newval=newval||0;
-    oldval = oldval||0;
     diff=newval-oldval;
-    if(diff===0){
-        return;
-    }
     attr = attr.slice(0,3).toUpperCase()+'-mod';
     fields = Object.keys(PFConst.abilityScoreManualDropdowns);
     fields = fields.concat(_.values(PFConst.abilityScoreManualDropdowns));
     PFAttacks.updateRepeatingWeaponAbilityDropdowns(attr,newval,oldval);
+    PFSkills.updateAbilitySkillsDiff(attr,newval,oldval);
     //TAS.debug("propagateAbilityDiffAsync about to get fields:",fields);
     getAttrs(fields,function(v){
         var  setter, params ={};
@@ -326,123 +323,65 @@ function setAllAbilityScoresAsync (callback, silently) {
  * @param {int} oldVal old value of attrib
  */
 function updateAbilityScoreDiffAsync ( attrib, newVal, oldVal){
-    var abilityName='',abilityMod='',attributes=[],attribType='',silently=false,
-    done=function(){
-        if(typeof callback === "function"){
-            callback();
-        }
-    };
+    var abilityName='',abilityMod='',attributes=[],attribType='',silently=false;
     TAS.debug("at updateAbilityScoreDiffAsync: attrib:"+attrib+", newVal:"+newVal+", oldVal:"+oldVal);
-    if(attrib.indexOf('-')>0){
-        abilityName=attrib.slice(0,attrib.indexOf('-'));
-        attribType=attrib.slice(attrib.indexOf('-')+1);
-        //if it's a buff we have to handle differently
-        if (abilityName.indexOf('buff_')===0){
-            //also attrib will be 'total' or 'total_penalty'
-            abilityName = abilityName.slice(5);
-        }
-        abilityName=abilityName.toUpperCase();
-        TAS.debug("updateAbilityScoreDiffAsync: the ability name is "+abilityName +", from : "+attrib);
-    } else {
-        //should not happen if from user
-        //we don't use this function for worksheet
-        done();
+    abilityName=attrib.slice(0,attrib.indexOf('-'));
+    attribType=attrib.slice(attrib.indexOf('-')+1);
+    //if it's a buff we have to handle differently
+    if (abilityName.indexOf('buff_')===0){
+        //also attrib will be 'total' or 'total_penalty'
+        abilityName = abilityName.slice(5);
+    }
+    abilityName=abilityName.toUpperCase();
+    attribType=attribType.toLowerCase();
+    //move complicated ones to regular update
+    if (newVal==='-' || abilityName ==='DEX' || abilityName==='STR' || attribType==='damage'||attribType==='penalty'||attribType==='total_penalty'||attribType==='cond'){
+        setAbilityScoreAsync(abilityName);
         return;
     }
+    TAS.debug("updateAbilityScoreDiffAsync: the ability name is "+abilityName +", from : "+attrib);
+
     abilityMod=abilityName+'-mod';
     attributes = [abilityName,abilityMod];
-    attribType=attribType.toLowerCase();
-    if (abilityName ==='DEX' || abilityName==='STR'){
-        attributes.push('condition-Helpless');
-        attributes.push('condition-Paralyzed');
-    }
-    if(attribType==='penalty'||attribType==='total_penalty'||attribType==='cond'){
-        attributes.push(abilityName+'-penalty');
-        attributes.push('buff_'+abilityName+'-total_penalty');
-        attributes.push(abilityName+'-cond');
-        attributes.push(abilityName+'-modded');
-    }
+
     getAttrs(attributes,function(v){
-        var setter={},currAbility=0,currMod=0,modded=0,diff=0,absdiff=0,newAbility=0,newMod=0,tempInt=0,params={},
+        var currAbility=0,currMod=0,diff=0,absdiff=0,newAbility=0,newMod=0,setter={},params={},
         modUpdated=false;
         try{
-            //if paralyzed or helpless, dont even bother updating str or dex
-            currAbility=parseInt(v[abilityName],10);
-            if ( isNaN(currAbility) || currAbility < 2 || 
-                ((abilityName==='STR' ||abilityName==='DEX') && ((parseInt(v['condition-Paralyzed'],10)||0)===1)) ||
-                (abilityName==='DEX' && ((parseInt(v['condition-Helpless'],10)||0)===1)) ) {
-                if (typeof callback === "function"){
-                    callback();
-                }
-                return;
-            }
-            newAbility=currAbility;
             currMod=parseInt(v[abilityMod],10)||0;
+            currAbility=parseInt(v[abilityName],10);
+            newAbility=currAbility;
             diff=newVal-oldVal;
-            newMod=currMod;
-            switch(attribType) {
-                case 'cond':
-                case 'penalty':
-                case 'total_penalty':
-                    //for penalties, all 3 add up to total penalty
-                    newVal = (parseInt(v['buff_'+abilityName+'-total_penalty'],10)||0) +
-                        (parseInt(v[abilityName+'-cond'],10)||0) + 
-                        (parseInt(v[abilityName+'-penalty'],10)||0);                
-                case 'damage':
-                    modded = parseInt(v[abilityName+'-modded'],10)||0;
-                    absdiff=Math.abs(diff);
-                    if ( !(newVal % 2) || absdiff > 1) {
-                        tempInt = Math.floor( (absdiff+1)/2);
-                        if (diff<0){
-                            tempInt= tempInt * -1;
-                        }
-                        newMod=currMod+tempInt;
-                    }
-                    if (newVal!==0 && modded!==1){
-                        setter[abilityName+'-modded']=1;
-                    } else if (newVal===0 && modded === 1) {
-                        setter[abilityName+'-modded']=0;
-                    }
-                    break;
-                case 'base':
-                case 'enhance':
-                case 'drain':
-                case 'total':
-                case 'inhernet':
-                case 'misc':
-                default:
-                    newAbility=currAbility+diff;
-                    if ( !(newAbility % 2) || absdiff > 1) {
-                        newMod=Math.floor((newAbility - 10) / 2);
-                    }
-                    break;
-            }
-            if (newMod < -5){
-                newMod = -5;
+            newAbility+=diff;
+            if(newAbility<0){
+                newAbility=0;
             }
             if(newAbility!==currAbility){
                 setter[abilityName]=newAbility;
             }
-            if(newMod!==currMod){
-                setter[abilityMod]=newMod;
-                modUpdated=true;
-            } else {
-                silently=true;
+            newMod=currMod;
+            if ( !(newAbility % 2) || absdiff > 1) {
+                newMod=Math.floor((newAbility - 10) / 2);
+                //newMod=Math.floor((newAbility - 10) / 2);
+                if(newMod!==currMod){
+                    setter[abilityMod]=newMod;
+                } else {
+                    silently=true;
+                }
             }
         } catch (err){
             TAS.error("PFAbilityScores.updateAbilityScoreDiff error:",err);
         } finally {
             if(_.size(setter)>0){
                 if(silently){
-                    params=PFonst.silentParams;                    
+                    params=PFConst.silentParams;                    
                 }
-                SWUtils.setWrapper(setter,params,done);
-            } else {
-                done();
+                SWUtils.setWrapper(setter,params);
             }
         }
     });
 }
+
 
 /** applies conditions for exhausted, fatigued, entangled, grappled
  * for paralyzed and helpless sets but does not unset- so we don't call it for those , can remove or else
@@ -541,15 +480,19 @@ function registerEventHandlers () {
     var updateAbilityScoreDiffQuick =function(eventInfo){
         var prev=parseInt(eventInfo.previousValue,10)||0,
             newv=parseInt(eventInfo.newValue,10)||0;
-        if(!isNaN(newv) && !isNaN(newv) && prev!==newv){
+        TAS.debug("updating from "+prev+" to "+ newv);
+        if (prev!==newv) {
             updateAbilityScoreDiffAsync(eventInfo.sourceAttribute,newv,prev);
+        } else if (eventInfo.newValue==='-' && eventInfo.sourceAttribute.indexOf('-base')>0   ) {
+            if(eventInfo.oldValue!=='-')
+            updateAbilityScoreDiffAsync(eventInfo.sourceAttribute,eventInfo.newValue,eventInfo.previousValue);
         }
     },
     /** calls propagateAbilityModsAsync if there is a change */
     updateAbilityScoreModQuick =function(eventInfo){
         var prev=parseInt(eventInfo.previousValue,10)||0,
             newv=parseInt(eventInfo.newValue,10)||0;
-        if(!isNaN(newv) && !isNaN(newv) && prev!==newv){
+        if( prev!==newv){
             propagateAbilityDiffAsync(eventInfo.sourceAttribute,newv,prev);
         }
     },
@@ -559,7 +502,7 @@ function registerEventHandlers () {
 
     on(tempEventToWatch, TAS.callback(function eventUpdateAbilityAuto(eventInfo) {
         if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType,eventInfo);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             updateAbilityScoreDiffQuick(eventInfo);
         }
     }));
@@ -570,12 +513,11 @@ function registerEventHandlers () {
 
     on(tempEventToWatch, TAS.callback(function eventUpdateAbilityPlayer(eventInfo) {
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType,eventInfo,eventInfo);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             updateAbilityScoreDiffQuick(eventInfo);
         }
     }));
 
-  
     on(events.abilityModAuto, TAS.callback(function eventUpdateAbilityModAuto(eventInfo){
         TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType, eventInfo);
         if (eventInfo.sourceType==="sheetworker" || eventInfo.sourceType === "api"){

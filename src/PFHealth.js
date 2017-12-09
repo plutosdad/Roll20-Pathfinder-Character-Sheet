@@ -335,7 +335,7 @@ export var recalculate = TAS.callback(function PFHealthRecalculate(callback, sil
 });
 function registerEventHandlers () {
 	on("change:set_pfs",TAS.callback(function eventsetPFSFlag(eventInfo){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if(eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			getAttrs(["set_pfs"],function(v){
 				if (parseInt(v.set_pfs,10)){
@@ -346,14 +346,14 @@ function registerEventHandlers () {
 	}));
 	//hp************************************************************************
 	on("change:hp-ability-mod change:level change:total-hp change:total-mythic-hp change:hp-formula-mod ", TAS.callback(function eventUpdateHPPlayerMisc(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api" ) {
 			updateMaxHPLookup();
 		}
 	}));
 
 	on("change:mythic-adventures-show", TAS.callback(function eventUpdateHPPlayer(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			getAttrs(["total-mythic-hp"], function (v) {
 				if ((parseInt(v["total-mythic-hp"], 10) || 0) > 0) {
@@ -363,13 +363,13 @@ function registerEventHandlers () {
 		}
 	}));
 	on("change:hp-temp-misc", TAS.callback(function eventUpdateTempHP(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			updateTempMaxHP();
 		}
 	}));
 	on("change:HP_reset", TAS.callback(function eventResetHP(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			updateMaxHPLookup(null,null,eventInfo,true);
 			updateTempMaxHP(null,null,true);
@@ -380,12 +380,12 @@ function registerEventHandlers () {
 	}));
 	on("change:HP change:non-lethal-damage", TAS.callback(function eventUpdateHPCurr(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			updateCurrHPLookup(eventInfo);
 		}
 	}));
 	on("change:wound_threshold-show", TAS.callback(function eventResetConditionWounds(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			setWoundThreshholdsLookup(eventInfo);
 		}

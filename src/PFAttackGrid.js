@@ -413,18 +413,18 @@ function registerEventHandlers () {
     var tempString='';
     _.each(attackGridFields, function (attackFields, attack) {
         on("change:" + attackFields.miscmacro, TAS.callback(function eventAttackMisc(eventInfo) {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             SWUtils.evaluateAndAddToTotAsync(null,null,attackFields.miscmacro,attackFields.misc,attackFields.atk);
         }));
         on("change:"+attackFields.babdd, TAS.callback(function eventAttackGridUpdateBABorLevel(eventInfo) {
             if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                 SWUtils.setDropdownAndAddToTotAsync(attackFields.babdd,attackFields.bab,attackFields.atk);
             }
         }));
         on("change:" + attackFields.bab + " change:" + attackFields.abilityMod + " change:" + attackFields.misc, TAS.callback(function eventAttackGridDropDownMod(eventInfo) {
             if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
-                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                 updateAttackAsync(attack);
             }
         }));
@@ -432,12 +432,12 @@ function registerEventHandlers () {
 
     on("change:attk-penalty", TAS.callback(function eventAttackPenalty(eventInfo) {
         if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             updateAttacks(null,null,null,eventInfo);
         }
     }));
     on("change:acp-attack-mod", TAS.callback(function PFAttackGrid_applyConditions(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         applyConditions();
     }));
 

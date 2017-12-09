@@ -3371,7 +3371,7 @@ export function importFromCompendium (eventInfo, callback, errorCallback) {
 // change:npc_compendium_category
 on("change:npc_import_now", TAS.callback(function eventParseMonsterImport(eventInfo) {
 	if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		getAttrs(['npc_import_now'], function (v) {
 			if (parseInt(v.npc_import_now, 10) === 1) {
 				importFromCompendium(eventInfo);
@@ -3382,7 +3382,7 @@ on("change:npc_import_now", TAS.callback(function eventParseMonsterImport(eventI
 /*
 on("sheet:compendium-drop", TAS.callback(function eventCompendiumDrop(eventInfo) {
 	if (eventInfo.sourceType === "player" ) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		importFromCompendium(eventInfo,function(){
 			getAttrs(['vision'],function(v){
 				var setter={}, matches,tempint=0;

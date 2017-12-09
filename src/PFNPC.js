@@ -38,7 +38,7 @@ export var recalculate = TAS.callback(function PFNPCRecalculate(callback, silent
 });
 function registerEventHandlers () {
 	on("change:is_npc", TAS.callback(function eventSetIsNPCFlag(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			getAttrs(['is_npc'],function(v){
 				if (parseInt(v.is_npc,10)===1){

@@ -613,32 +613,32 @@ export var recalculate = TAS.callback(function PFEncumbranceRecalculate(callback
 });
 function registerEventHandlers  () {
     on("change:speed-base change:race change:armor3-equipped change:max-dex-source change:run-mult", TAS.callback(function eventUpdateSpeedPlayer(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api"){
             updateModifiedSpeed();
         }
     }));
     on("change:is_dwarf change:current-load change:armor3-equipped change:armor3-type", TAS.callback(function eventUpdateSpeedAuto(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api"){
             updateModifiedSpeed();
         }
     }));
 
     on('change:load-light change:carried-total', TAS.callback(function eventUpdateCurrentLoad(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api"){
             updateCurrentLoad();
         }
     }));
     on("change:size-multiplier change:legs change:load-str-bonus change:load-multiplier change:load-misc", TAS.callback(function eventUpdateLoadsAndLiftPlayer(eventInfo) {
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api"){
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             updateLoadsAndLift();
         }
     }));
     on("change:STR change:size", TAS.callback(function eventUpdateLoadsAndLiftAuto(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api"){
             updateLoadsAndLift();
         }

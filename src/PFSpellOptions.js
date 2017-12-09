@@ -400,7 +400,7 @@ function registerEventHandlers () {
         var eventToWatch = "change:repeating_spells:" + fieldToWatch;
         on(eventToWatch, TAS.callback(function eventOptionsRepeatingSpellsPlayer(eventInfo) {
             if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                 updateSpellOption(eventInfo, fieldToWatch);
             }
         }));
@@ -409,7 +409,7 @@ function registerEventHandlers () {
     _.each(optionToggles, function (toggleField) {
         on("change:" + toggleField, TAS.callback(function toggleSpellOptionField(eventInfo) {
             if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                 resetOptions(null, eventInfo);
             }
         }));

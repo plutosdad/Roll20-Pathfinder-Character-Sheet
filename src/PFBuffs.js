@@ -1,6 +1,5 @@
 'use strict';
 import _ from 'underscore';
-import {PFLog, PFConsole} from './PFLog';
 import TAS from 'exports-loader?TAS!TheAaronSheet';
 import * as SWUtils from './SWUtils';
 import PFConst from './PFConst';
@@ -147,26 +146,18 @@ events = {
 		"Fort": [PFSaves.updateSave],
 		"Will": [PFSaves.updateSave],
 		"Ref": [PFSaves.updateSave],
-		"STR_skills":[PFSkills.recalculateAbilityBasedSkills],
-		"DEX_skills":[PFSkills.recalculateAbilityBasedSkills],
-		"CON_skills":[PFSkills.recalculateAbilityBasedSkills],
-		"INT_skills":[PFSkills.recalculateAbilityBasedSkills],
-		"WIS_skills":[PFSkills.recalculateAbilityBasedSkills],
-		"CHA_skills":[PFSkills.recalculateAbilityBasedSkills],
+		"STR_skills":[PFSkills.updateAbilityBasedSkillsDiffFromBuff],
+		"DEX_skills":[PFSkills.updateAbilityBasedSkillsDiffFromBuff],
+		"CON_skills":[PFSkills.updateAbilityBasedSkillsDiffFromBuff],
+		"INT_skills":[PFSkills.updateAbilityBasedSkillsDiffFromBuff],
+		"WIS_skills":[PFSkills.updateAbilityBasedSkillsDiffFromBuff],
+		"CHA_skills":[PFSkills.updateAbilityBasedSkillsDiffFromBuff],
 		"Melee": [PFAttackGrid.updateAttackGrid],
 		"Ranged": [PFAttackGrid.updateAttackGrid],
 		"CMB": [PFAttackGrid.updateAttackGrid],
 		"melee2": [PFAttackGrid.updateAttackGrid],
 		"ranged2": [PFAttackGrid.updateAttackGrid],
 		"cmb2": [PFAttackGrid.updateAttackGrid]
-	},
-	buffTotalAbilityEvents: {
-		"STR": [PFAbilityScores.setAbilityScoreAsync],
-		"DEX": [PFAbilityScores.setAbilityScoreAsync],
-		"CON": [PFAbilityScores.setAbilityScoreAsync],
-		"INT": [PFAbilityScores.setAbilityScoreAsync],
-		"WIS": [PFAbilityScores.setAbilityScoreAsync],
-		"CHA": [PFAbilityScores.setAbilityScoreAsync]
 	},
 	buffEventsTotalOnUpdate :{
 		"buff_Check-total":[PFSkills.updateAllSkillsDiff],
@@ -2042,7 +2033,7 @@ function registerEventHandlers () {
 
 	on("change:add_common_buff",TAS.callback(function eventAddCommonBuff(eventInfo){
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType ==="api") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + ", event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + ", event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			addCommonBuff(null,eventInfo);
 		}
 	}));
@@ -2051,7 +2042,7 @@ function registerEventHandlers () {
 		_.each(charFieldMap,function(field,bonustype){
 			on("change:"+field,TAS.callback(function eventCharFieldUpdatesBuff(eventInfo){
 				if (eventInfo.sourceType === "player" || eventInfo.sourceType ==="api") {
-					TAS.debug("caught " + eventInfo.sourceAttribute + ", event: " + eventInfo.sourceType);
+					TAS.debug("caught " + eventInfo.sourceAttribute + ", event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 					updateBuffTotalAsync(buff);
 				}
 			}));
@@ -2062,7 +2053,7 @@ function registerEventHandlers () {
 		_.each(charFieldArray,function(field){
 			on("change:"+field,TAS.callback(function eventCharBuffHelperField(eventInfo){
 				if (eventInfo.sourceType === "player" || eventInfo.sourceType ==="api") {
-					TAS.debug("caught " + eventInfo.sourceAttribute + ", event: " + eventInfo.sourceType);
+					TAS.debug("caught " + eventInfo.sourceAttribute + ", event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 					updateBuffTotalAsync(buff);
 				}
 			}));
@@ -2072,7 +2063,7 @@ function registerEventHandlers () {
 	buffsPerRow.forEach(function(b){
 		var prefix = "change:repeating_buff2:" + b ;
 		on(prefix + "_macro-text", TAS.callback(function eventBuffMacroText(eventInfo) {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " for column " + b + ", event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " for column " + b + ", event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			SWUtils.evaluateAndSetNumber('repeating_buff2_'+b+'_macro-text', 'repeating_buff2_'+b+'_val',0,null,false);
 		}));
 		on(prefix + "_bonustype", TAS.callback(function PFBuffs_updateBuffbonustype(eventInfo) {
@@ -2087,7 +2078,7 @@ function registerEventHandlers () {
 			}
 		}));
 		on(prefix + "-show ", TAS.callback(function PFBuffs_updateBuffRowShowBuff(eventInfo) {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			if (eventInfo.sourceType === "player" || eventInfo.sourceType ==="api") {
 				getAttrs(['repeating_buff2_'+b+'_val','repeating_buff2_'+b+'_bonus','repeating_buff2_enable_toggle'],function(v){
 					TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType,v);
@@ -2099,7 +2090,7 @@ function registerEventHandlers () {
 			}
 		}));
 		on(prefix + "_val" , TAS.callback(function updateBuffValue(eventInfo) {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType ==="api") {
 				getAttrs(['repeating_buff2_'+b+'-show','repeating_buff2_'+b+'_bonus','repeating_buff2_enable_toggle'],function(v){
 					TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType,v);
@@ -2131,7 +2122,7 @@ function registerEventHandlers () {
 	});
 	on('change:repeating_buff2:add_note_to_roll',TAS.callback(function PFBuffs_addnote(eventInfo){
 		if (eventInfo.sourceType === "player" ){
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			addNoteAsync(null,eventInfo);
 		}
 	}));
@@ -2158,7 +2149,7 @@ function registerEventHandlers () {
 	on("change:repeating_buff2:bufftype", TAS.callback(function eventBuff2Type(eventInfo){
 		var setter={};
 		if (eventInfo.sourceType === "player") {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			getAttrs(['buffs_tab','repeating_buff2_bufftype','repeating_buff2_tabcat'],function(v){
 				setter['buffs_tab'] = v.repeating_buff2_bufftype||'99';
 				setter['repeating_buff2_tabcat']=v.repeating_buff2_bufftype||'-1';
@@ -2167,7 +2158,7 @@ function registerEventHandlers () {
 		}
 	}));	
 	on("remove:repeating_buff2", TAS.callback(function PFBuffs_removeBuffRow(eventInfo) {
-		TAS.debug("caught remove " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught remove " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType ==="api") {
 			updateAllBuffTotalsAsync(null,null,eventInfo);
 		}
@@ -2178,7 +2169,7 @@ function registerEventHandlers () {
 		var eventToWatch = "change:buff_" + col + "-total";
 		_.each(functions, function (methodToCall) {
 			on(eventToWatch, TAS.callback(function event_updateBuffNonAbilityEvents(eventInfo) {
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
 					methodToCall(col, eventInfo);
 				}
@@ -2190,7 +2181,7 @@ function registerEventHandlers () {
 		var eventToWatch = "change:buff_" + col + "-total change:buff_" + col + "-total_penalty";
 		_.each(functions, function (methodToCall) {
 			on(eventToWatch, TAS.callback(function event_updateBuffAbilityEvents(eventInfo) {
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
 					PFAbilityScores.updateAbilityScoreDiffQuick(eventInfo);
 					//methodToCall(col, eventInfo);
@@ -2203,7 +2194,7 @@ function registerEventHandlers () {
 		var eventToWatch = "change:buff_" + col + "-total";
 		_.each(functions, function (methodToCall) {
 			on(eventToWatch, TAS.callback(function eventBuffTotalNoParam(eventInfo) {
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api" || eventInfo.sourceType === "api") {
 					methodToCall(null,false,null, eventInfo);
 				}
@@ -2211,7 +2202,7 @@ function registerEventHandlers () {
 		});
 	});
 	on('change:merge_buffs_now', TAS.callback(function eventMergeBuffs(eventInfo){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player"){
 			getAttrs(['merge_buffs_now'],function(v){
 				if(parseInt(v.merge_buffs_now),10){
@@ -2225,7 +2216,7 @@ function registerEventHandlers () {
 	custombuffs.forEach(function(buff){
 		on('change:buff_'+buff+'-total',TAS.callback(function customBuffTotal(eventInfo){
 			if(eventInfo.sourceType==='sheetworker'||eventInfo.sourceType==='api'){
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);		
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);		
 				SWUtils.evaluateAndAddAsync(null,null,buff,PFConst.customEquationMacros[buff],'buff_'+buff+'-total');		
 			}
 		}));
@@ -2233,5 +2224,3 @@ function registerEventHandlers () {
 
 }
 registerEventHandlers();
-//PFConsole.log('   PFBuffs module loaded          ');
-//PFLog.modulecount++;

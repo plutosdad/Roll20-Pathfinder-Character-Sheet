@@ -178,7 +178,7 @@ function registerEventHandlers () {
 		_.each(functions, function (methodToCall) {
 			on(eventToWatch, TAS.callback(function eventConditionEventsPlayer(eventInfo) {
 				if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-					TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+					TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 					methodToCall(null,null,eventInfo);
 				}
 			}));
@@ -187,13 +187,13 @@ function registerEventHandlers () {
 	_.each(events.conditionEventsEither, function (functions, eventToWatch) {
 		_.each(functions, function (methodToCall) {
 			on(eventToWatch, TAS.callback(function eventConditionEventsEither(eventInfo) {
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				methodToCall(null,null,eventInfo);
 			}));
 		});
 	});
 	on("change:Perception-cond", TAS.callback(function eventUpdateSkillPerceptionCond(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		PFSkills.verifyHasSkill("Perception",function(hasSkill){
 			if (hasSkill){
 				PFSkills.updateSkillAsync("Perception", eventInfo);

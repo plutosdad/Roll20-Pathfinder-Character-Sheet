@@ -68,19 +68,19 @@ export var recalculate = TAS.callback(function PFPsionicRecalculate(callback, si
 });
 function registerEventHandlers () {
 	on("change:psionic-level change:psionic-level-misc", TAS.callback(function eventUpdatePsionicLevel(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			SWUtils.updateRowTotal(["psionic-level-total", "psionic-level", "psionic-level-misc"]);
 		}
 	}));
 	on("change:class-psionic-power change:ability-psionic-power change:misc-psionic-power", TAS.callback(function eventUpdatePsionicPower(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" || (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api" && eventInfo.sourceAttribute==='ability-psionic-power')) {
 			SWUtils.updateRowTotal(["psionic-power_max", "class-psionic-power", "ability-psionic-power", "misc-psionic-power"]);
 		}
 	}));
 	on("change:selected-ability-psionic-power change:psionic-level-total", TAS.callback(function eventUpdatePsionicBonusPower(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		updatePsionicBonusPower();
 	}));
 }

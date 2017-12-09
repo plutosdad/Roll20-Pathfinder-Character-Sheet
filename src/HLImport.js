@@ -1389,7 +1389,7 @@ export function importCharacter (characterObj)
 }
 export function registerEventHandlers () {
 	on("change:herolab_import", function(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType !== "player")
 			return;
 		getAttrs(["herolab_import"], function(values) {

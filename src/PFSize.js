@@ -322,7 +322,7 @@ export var recalculate = TAS.callback(function PFSizeRecalculate(callback, silen
 function registerEventHandlers () {
 	//size
 	on("change:size change:default_char_size", TAS.callback(function eventUpdateSize(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" ) {
 			setNewSize(eventInfo);
 		} else {

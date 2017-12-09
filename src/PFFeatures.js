@@ -509,7 +509,7 @@ function registerEventHandlers () {
 
 	on("change:merge_traits_now change:merge_race_traits_now change:merge_feats_now change:merge_class_features_now change:merge_slas_now",
 		TAS.callback(function eventMergeOldList(eventInfo){
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" ) {
 				getAttrs([eventInfo.sourceAttribute],function(v){
 					if (parseInt(v[eventInfo.sourceAttribute],10)){
@@ -522,12 +522,12 @@ function registerEventHandlers () {
 	_.each(PFConst.repeatingMaxUseSections, function (section) {
 		var maxEvent = "change:repeating_" + section + ":max-calculation";
 		on(maxEvent, TAS.callback(function eventRepeatingMaxUseSections(eventInfo) {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			SWUtils.evaluateAndSetNumber("repeating_" + section + "_max-calculation", "repeating_" + section + "_used_max");
 		}));
 	});
 	on("change:mythic-adventures-show change:use_traits change:use_racial_traits change:use_class_features change:use_feats change:use_spell-like-abilities", TAS.callback(function eventEnableMythicConfig(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" ) {
 			resetTopCommandMacro(null,eventInfo);
 		}
@@ -543,7 +543,7 @@ function registerEventHandlers () {
 			var attr;
 			attr = SWUtils.getAttributeName(eventInfo.sourceAttribute);
 			if ( eventInfo.sourceType === "player" || eventInfo.sourceType === "api" || (eventInfo.sourceType === "sheetworker"  && attr==='used_max')) {
-				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 				attr='repeating_'+section+'_showinmenu';
 				getAttrs([attr,'is_npc'],function(v){
 					var isNPC=parseInt(v.is_npc,10)||0;

@@ -266,7 +266,7 @@ function applyTemplate(name){
 
 function registerEventHandlers () {
 	on("change:add_template",TAS.callback(function eventAddTemplate(eventInfo){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			getAttrs(['template_to_add','add_template'],function(v){
 				if(parseInt(v.add_template,10)){

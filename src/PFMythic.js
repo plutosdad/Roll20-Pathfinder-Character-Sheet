@@ -103,7 +103,7 @@ export var recalculate = TAS.callback(function PFMythicRecalculate(callback, sil
 function registerEventHandlers () {
 	//mythic path and power
 	on("change:mythic-tier change:mythic-hp", TAS.callback(function eventupdateMythicPathHP(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			updateMythicPathHP();
 			updateTierMythicPower();
@@ -111,13 +111,13 @@ function registerEventHandlers () {
 	}));
 	//mythic path
 	on("change:mythic-hp", TAS.callback(function eventUpdateTierMythicPower(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			updateMythicPathHP();
 		}
 	}));
 	on("change:misc-mythic-power change:tier-mythic-power", TAS.callback(function eventUpdateMythicPower(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" || (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api" && eventInfo.sourceAttribute==='tier-mythic-power')) {
 			SWUtils.updateRowTotal(["mythic-power_max", "tier-mythic-power", "misc-mythic-power"]);
 		}

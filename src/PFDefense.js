@@ -666,47 +666,47 @@ export var recalculate = TAS.callback(function PFDefenseRecalculate(callback, si
 function registerEventHandlers () {
     _.each(defenseDropdowns, function (write, read) {
         on("change:" + read, TAS.callback(function eventsetDefenseDropdownMod(eventInfo) {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             setDefenseDropdownMod(read,null,null,eventInfo,false);
         }));
     });
     on("change:uncanny_dodge" , TAS.callback(function eventUncannyDodgeUpdate(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             setDefenseDropdownMod(null,null,null,eventInfo,false);
         }
     }));
     on("change:hd_not_bab" , TAS.callback(function eventCMDSwitchHDandBAB(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             updateDefenses(null,null,eventInfo);
         }
     }));		
     on(events.defenseEventsAuto, TAS.callback(function eventUpdateDefensesAuto(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") {
             updateDefenses(null,null,eventInfo);
         }
     }));
     on(events.defenseEventsPlayer, TAS.callback(function eventUpdateDefensesPlayer(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             updateDefenses(null,null,eventInfo);
         }
     }));
     on(events.defenseEventsEither, TAS.callback(function eventUpdateDefensesEither(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         updateDefenses(null,null,eventInfo);
     }));
     on("change:max-dex-source change:current-load", TAS.callback(function eventUpdateArmor(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         updateArmor(null,null,eventInfo);
     }));
     _.each(defenseArmorShieldRows, function (row) {
         _.each(defenseArmorShieldColumns, function (column) {
             var eventToWatch = "change:" + row + "-" + column;
             on(eventToWatch, TAS.callback(function eventUpdateDefenseArmorShield(eventInfo) {
-                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                 updateArmor(null,null,eventInfo);
             }));
         });

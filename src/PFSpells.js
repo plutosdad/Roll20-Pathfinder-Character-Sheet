@@ -1670,7 +1670,7 @@ function registerEventHandlers  () {
         return memo;
     },"");
     on(tempstr,	TAS.callback(function playerUpdateSpell(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" ){
             updateSpell(null,eventInfo);
         }
@@ -1678,7 +1678,7 @@ function registerEventHandlers  () {
     _.each(events.repeatingSpellEventsPlayer, function (functions, eventToWatch) {
         _.each(functions, function (methodToCall) {
             on(eventToWatch, TAS.callback(function eventRepeatingSpellsPlayer(eventInfo) {
-                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
                 if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
                     methodToCall(null, eventInfo);
                 }
@@ -1686,7 +1686,7 @@ function registerEventHandlers  () {
         });
     });
    	on("remove:repeating_spells", TAS.callback(function eventUpdateRemoveSpell(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             PFAttacks.removeLinkedAttack(null, PFAttacks.linkedAttackType.spell , SWUtils.getRowId(eventInfo.sourceAttribute));
             resetCommandMacro();
@@ -1695,7 +1695,7 @@ function registerEventHandlers  () {
 	}));	
      on("change:spellmenu_groupby_school change:spellmenu_show_uses change:spellclass-0-hide_unprepared change:spellclass-1-hide_unprepared change:spellclass-2-hide_unprepared change:spellclass-0-show_domain_spells change:spellclass-1-show_domain_spells change:spellclass-2-show_domain_spells", TAS.callback(function eventOptionChange(eventInfo) {
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             resetCommandMacro();
         }
     }));
@@ -1704,25 +1704,25 @@ function registerEventHandlers  () {
         return memo;
     },"");
     on(tempstr,	TAS.callback(function eventRepeatingSpellMenuUpdate(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" ){
             updateSpell(null,eventInfo);
         }
     }));
     on("change:_reporder_repeating_spells", TAS.callback(function eventReorderRepeatingspells(eventInfo) {
         if (eventInfo.sourceType === "player" ) {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
             resetCommandMacro();
         }
     }));
     on("change:repeating_spells:spellclass_number change:repeating_spells:spell_level", TAS.callback(function eventRepeatingSpellsTotals(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             resetSpellsTotals();
         }
     }));
     on("change:repeating_spells:create-attack-entry", TAS.callback(function eventcreateAttackEntryFromSpell(eventInfo) {
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             createAttackEntryFromRow(null,null,false,eventInfo);
         }
@@ -1733,7 +1733,7 @@ function registerEventHandlers  () {
     },"");
     on(tempstr,	TAS.callback(function eventupdateAssociatedSpellAttack(eventInfo) {
         var attr;
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         attr = SWUtils.getAttributeName(eventInfo.sourceAttribute);
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" ){
             updateAssociatedAttack(null,null,null,eventInfo);
@@ -1745,7 +1745,7 @@ function registerEventHandlers  () {
     },"");
     on(tempstr,	TAS.callback(function eventupdateAssociatedSpellAttack(eventInfo) {
         var attr;
-        TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType);
+        TAS.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
         attr = SWUtils.getAttributeName(eventInfo.sourceAttribute);
         if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api"){
             updateAssociatedAttack(null,null,null,eventInfo);

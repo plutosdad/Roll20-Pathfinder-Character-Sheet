@@ -908,7 +908,7 @@ function registerEventHandlers () {
 
 
 	on("remove:repeating_ability", TAS.callback(function eventRemoveAbility(eventInfo){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		PFAttacks.removeLinkedAttack(null,PFAttacks.linkedAttackType.ability,SWUtils.getRowId(eventInfo.sourceAttribute));
 	}));
 	macroEvent = _.reduce(events.commandMacroFields,function(m,a){
@@ -917,13 +917,13 @@ function registerEventHandlers () {
 	},macroEvent);
 	on (macroEvent, TAS.callback(function eventRepeatingAbilityCommandMacroUpdate(eventInfo){
 		if ( eventInfo.sourceType === "player" || eventInfo.sourceType === "api" || (/used_max/i).test(eventInfo.sourceAttribute)) {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			PFFeatures.resetTopCommandMacro(null,eventInfo);
 			resetCommandMacro();
 		}
 	}));
 	on("change:repeating_ability:CL-basis", TAS.callback(function eventAbilityClassDropdown(eventInfo){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		SWUtils.evaluateAndSetNumber('repeating_ability_CL-basis','repeating_ability_CL-basis-mod');
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" ) {
 			setClassName(null,null,eventInfo);
@@ -935,44 +935,44 @@ function registerEventHandlers () {
 	},"");
 	on(eventToWatch,	TAS.callback(function eventChangeAbilityTypeFrequencyOrRange(eventInfo){
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" ||  (/range/i).test(eventInfo.sourceAttribute) ) {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			resetOptionAsync();
 		}
 	}));
 	on("change:repeating_ability:CL-misc change:repeating_ability:spell_level-misc", 
 		TAS.callback(function eventSLAEquationMacro(eventInfo){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		SWUtils.evaluateAndSetNumber(eventInfo.sourceAttribute, eventInfo.sourceAttribute+"-mod");
 	}));
 	on("change:buff_CasterLevel-total change:CasterLevel-Penalty",
 		TAS.callback(function eventAbilityLevelChange(eventInfo){
 		if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api"  ) {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			recalcAbilities(null,null,eventInfo,true);
 		}
 	}));
 	on("change:repeating_ability:CL-basis-mod change:repeating_ability:CL-misc-mod",
 		TAS.callback(function eventAbilityLevelChange(eventInfo){
 		if (eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api"  ) {
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			updateCharLevel(null,null,eventInfo);
 		}
 	}));
 	on("change:repeating_ability:compendium_category", TAS.callback(function eventAbilityCompendium(eventInfo){
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType==="api"){
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			importFromCompendium(null,eventInfo);
 		}
 	}));
 	on("change:repeating_ability:create-attack-entry", TAS.callback(function eventcreateAttackEntryFromSLA(eventInfo) {
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
 			createAttackEntryFromRow(null,null,false,eventInfo);
 		}
 	}));
 	on("change:repeating_ability:CL-misc-mod change:repeating_ability:CL-basis-mod change:repeating_ability:range_pick change:repeating_ability:range",
 		TAS.callback(function eventClassRangeMod(eventInfo){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		//cl-misc-mod, cl-basis-mod  is sheetworker, range_pick and range must be player
 		if ( ((/range/i).test(eventInfo.sourceAttribute) && (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" )) || 
 			((/CL/i).test(eventInfo.sourceAttribute) && eventInfo.sourceType === "sheetworker" || eventInfo.sourceType === "api") ) {
@@ -985,16 +985,16 @@ function registerEventHandlers () {
 	},"");
 	on(eventToWatch, TAS.callback(function eventupdateAssociatedSLAttackAttack(eventInfo) {
 		if (eventInfo.sourceType === "player" || eventInfo.sourceType==="api" || (/range_numeric/i).test(eventInfo.sourceAttribute) ){
-			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 			updateAssociatedAttack(null,null,null,eventInfo);
 		}
 	}));
 	on("change:repeating_ability:rule_category", TAS.callback(function eventUpdateAbilityRule(eventInfo){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		setRuleTab(null,null,null,eventInfo);
 	}));
 	on("change:repeating_ability:ability_type", TAS.callback(function eventUpdateAbilityType(eventInfo){
-		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType + " from:" + eventInfo.previousValue + " to:" + eventInfo.newValue);
 		setTypeTab(null,null,null,eventInfo);
 	}));
 
