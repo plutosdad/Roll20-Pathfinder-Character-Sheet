@@ -23,7 +23,7 @@ classesUsingOtherSpellLists = {
     "bloodrager": "sorcerer"
 };
 
-export function resetCommandMacro (eventInfo, callback) {
+export function resetCommandMacro (dummy, eventInfo, callback) {
     //TAS.debug("at PFSpells.resetCommandMacro");
     var done = _.once(function () {
         if (typeof callback === "function") {
@@ -31,12 +31,12 @@ export function resetCommandMacro (eventInfo, callback) {
         }
     }),
     repeatingSpellAttrs = ["spell_level","spellclass_number","name","school","slot","metamagic","used","isDomain","isMythic"],
-    class0BaseMacro = "&{template:pf_block} @{toggle_spell_accessible} @{toggle_rounded_flag}{{font=@{apply_specfont_chat}@{use_specfont}}} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=@{spellclass-0-name} ^{spells}}} {{concentration=@{Concentration-0}}} {{casterlevel=@{spellclass-0-level-total}}} {{row01=**^{checks}**}} {{row02=[^{caster-level-check}](~@{character_id}|Spell-Class-0-CL-Check) [^{concentration-check}](~@{character_id}|Concentration-Check-0) [^{spell-failure}](~@{character_id}|Spell-Fail-Check)}}",
-    class1BaseMacro = "&{template:pf_block} @{toggle_spell_accessible} @{toggle_rounded_flag}{{font=@{apply_specfont_chat}@{use_specfont}}} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=@{spellclass-1-name} ^{spells}}} {{concentration=@{Concentration-1}}} {{casterlevel=@{spellclass-1-level-total}}} {{row01=**^{checks}**}} {{row02=[^{caster-level-check}](~@{character_id}|Spell-Class-1-CL-Check) [^{concentration-check}](~@{character_id}|Concentration-Check-1) [^{spell-failure}](~@{character_id}|Spell-Fail-Check)}}",
-    class2BaseMacro = "&{template:pf_block} @{toggle_spell_accessible} @{toggle_rounded_flag}{{font=@{apply_specfont_chat}@{use_specfont}}} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=@{spellclass-2-name} ^{spells}}} {{concentration=@{Concentration-2}}} {{casterlevel=@{spellclass-2-level-total}}} {{row01=**^{checks}**}} {{row02=[^{caster-level-check}](~@{character_id}|Spell-Class-2-CL-Check) [^{concentration-check}](~@{character_id}|Concentration-Check-2) [^{spell-failure}](~@{character_id}|Spell-Fail-Check)}}",
-    npcClass0BaseMacro = "&{template:pf_block} @{toggle_spell_accessible} @{toggle_rounded_flag}{{font=@{apply_specfont_chat}@{use_specfont}}} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=^{npc} @{spellclass-0-name} ^{spells}}} {{concentration=@{Concentration-0}}} {{casterlevel=@{spellclass-0-level-total}}} {{row01=**^{checks}**}} {{row02=[^{caster-level-check}](~@{character_id}|Spell-Class-0-CL-Check) [^{concentration-check}](~@{character_id}|Concentration-Check-0) [^{spell-failure}](~@{character_id}|Spell-Fail-Check)}}",
-    npcClass1BaseMacro = "&{template:pf_block} @{toggle_spell_accessible} @{toggle_rounded_flag}{{font=@{apply_specfont_chat}@{use_specfont}}} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=^{npc} @{spellclass-1-name} ^{spells}}} {{concentration=@{Concentration-1}}} {{casterlevel=@{spellclass-1-level-total}}} {{row01=**^{checks}**}} {{row02=[^{caster-level-check}](~@{character_id}|Spell-Class-1-CL-Check) [^{concentration-check}](~@{character_id}|Concentration-Check-1) [^{spell-failure}](~@{character_id}|Spell-Fail-Check)}}",
-    npcClass2BaseMacro = "&{template:pf_block} @{toggle_spell_accessible} @{toggle_rounded_flag}{{font=@{apply_specfont_chat}@{use_specfont}}} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=^{npc} @{spellclass-2-name} ^{spells}}} {{concentration=@{Concentration-2}}} {{casterlevel=@{spellclass-2-level-total}}} {{row01=**^{checks}**}} {{row02=[^{caster-level-check}](~@{character_id}|Spell-Class-2-CL-Check) [^{concentration-check}](~@{character_id}|Concentration-Check-2) [^{spell-failure}](~@{character_id}|Spell-Fail-Check)}}",
+    class0BaseMacro = "&{template:pf_block} @{toggle_spell_accessible} @{toggle_rounded_flag}{{font=@{apply_specfont_chat}@{use_specfont}}} {{scroll_desc=@{scroll-desc}}} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=@{spellclass-0-name} ^{spells}}} {{concentration=@{Concentration-0}}} {{casterlevel=@{spellclass-0-level-total}}} {{row01=**^{checks}**}} {{row02=[^{caster-level-check}](~@{character_id}|Spell-Class-0-CL-Check) [^{concentration-check}](~@{character_id}|Concentration-Check-0) [^{spell-failure}](~@{character_id}|Spell-Fail-Check)}}",
+    class1BaseMacro = "&{template:pf_block} @{toggle_spell_accessible} @{toggle_rounded_flag}{{font=@{apply_specfont_chat}@{use_specfont}}} {{scroll_desc=@{scroll-desc}}} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=@{spellclass-1-name} ^{spells}}} {{concentration=@{Concentration-1}}} {{casterlevel=@{spellclass-1-level-total}}} {{row01=**^{checks}**}} {{row02=[^{caster-level-check}](~@{character_id}|Spell-Class-1-CL-Check) [^{concentration-check}](~@{character_id}|Concentration-Check-1) [^{spell-failure}](~@{character_id}|Spell-Fail-Check)}}",
+    class2BaseMacro = "&{template:pf_block} @{toggle_spell_accessible} @{toggle_rounded_flag}{{font=@{apply_specfont_chat}@{use_specfont}}} {{scroll_desc=@{scroll-desc}}} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=@{spellclass-2-name} ^{spells}}} {{concentration=@{Concentration-2}}} {{casterlevel=@{spellclass-2-level-total}}} {{row01=**^{checks}**}} {{row02=[^{caster-level-check}](~@{character_id}|Spell-Class-2-CL-Check) [^{concentration-check}](~@{character_id}|Concentration-Check-2) [^{spell-failure}](~@{character_id}|Spell-Fail-Check)}}",
+    npcClass0BaseMacro = "&{template:pf_block} @{toggle_spell_accessible} @{toggle_rounded_flag}{{font=@{apply_specfont_chat}@{use_specfont}}} {{scroll_desc=@{scroll-desc}}} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=^{npc} @{spellclass-0-name} ^{spells}}} {{concentration=@{Concentration-0}}} {{casterlevel=@{spellclass-0-level-total}}} {{row01=**^{checks}**}} {{row02=[^{caster-level-check}](~@{character_id}|Spell-Class-0-CL-Check) [^{concentration-check}](~@{character_id}|Concentration-Check-0) [^{spell-failure}](~@{character_id}|Spell-Fail-Check)}}",
+    npcClass1BaseMacro = "&{template:pf_block} @{toggle_spell_accessible} @{toggle_rounded_flag}{{font=@{apply_specfont_chat}@{use_specfont}}} {{scroll_desc=@{scroll-desc}}} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=^{npc} @{spellclass-1-name} ^{spells}}} {{concentration=@{Concentration-1}}} {{casterlevel=@{spellclass-1-level-total}}} {{row01=**^{checks}**}} {{row02=[^{caster-level-check}](~@{character_id}|Spell-Class-1-CL-Check) [^{concentration-check}](~@{character_id}|Concentration-Check-1) [^{spell-failure}](~@{character_id}|Spell-Fail-Check)}}",
+    npcClass2BaseMacro = "&{template:pf_block} @{toggle_spell_accessible} @{toggle_rounded_flag}{{font=@{apply_specfont_chat}@{use_specfont}}} {{scroll_desc=@{scroll-desc}}} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=^{npc} @{spellclass-2-name} ^{spells}}} {{concentration=@{Concentration-2}}} {{casterlevel=@{spellclass-2-level-total}}} {{row01=**^{checks}**}} {{row02=[^{caster-level-check}](~@{character_id}|Spell-Class-2-CL-Check) [^{concentration-check}](~@{character_id}|Concentration-Check-2) [^{spell-failure}](~@{character_id}|Spell-Fail-Check)}}",
     pcBaseMacro=[class0BaseMacro,class1BaseMacro,class2BaseMacro],
     npcBaseMacro=[npcClass0BaseMacro,npcClass1BaseMacro,npcClass2BaseMacro],
     resetToDefault = function(configV){
@@ -399,7 +399,7 @@ function getSpellTotals  (ids, v, setter) {
                     //if (prepped !== 0){
                     //    setter[prefix + "-spells-prepared"] =0;
                     //}
-                    if (perday !== 0){
+                    if (perday === 0){
                         setter[prefix + "-spells-per-day"] = 0;
                     }
                 }
@@ -1101,6 +1101,7 @@ function updateSpell (id, eventInfo, callback, doNotUpdateTotals) {
                 case 'cl_misc':
                     updateClassLevel = true;
                     updateRange = true;
+                    updateConcentration = true;
                     break;
                 case 'spellclass_number':
                     updateClass = true;
@@ -1204,6 +1205,7 @@ function updateSpell (id, eventInfo, callback, doNotUpdateTotals) {
                 if(isNaN(currCasterLevel)){
                     updateClassLevel=true;
                     updateRange=true;
+                    updateConcentration=true;
                 } else {
                     casterlevel = currCasterLevel;
                 }
@@ -1260,7 +1262,7 @@ function updateSpell (id, eventInfo, callback, doNotUpdateTotals) {
                     setter[currDCField] = newDC;
                 }
             }
-            if (updateConcentration || updateClassLevel||updateClass) {
+            if (updateConcentration || updateClassLevel || updateClass) {
                 newConcentration = casterlevel + spellAbilityMod + (parseInt(v["Concentration-" + classNum + "-misc-mod"], 10) || 0) + (parseInt(v[prefix + "Concentration_misc"], 10) || 0);
                 if (newConcentration !== (parseInt(v[prefix + "Concentration-mod"], 10) || 0)) {
                     setter[prefix + "Concentration-mod"] = newConcentration;
@@ -1654,7 +1656,7 @@ var events = {
         ['DC_misc','Concentration_misc','range','range_pick','CL_misc','SP_misc','spellclass_number','spell_level'],
     repeatingSpellEventsPlayer: {
         "change:repeating_spells:compendium_category": [importFromCompendium],
-        "change:repeating_spells:used": [updateSpellsPerDay, updatePreparedSpellState],
+        "change:repeating_spells:used": [updateSpellsPerDay, updatePreparedSpellState, resetCommandMacro],
         "change:repeating_spells:metamagic": [toggleMetaMagic],
         "change:repeating_spells:name": [updateSpell]
     },
@@ -1692,7 +1694,8 @@ function registerEventHandlers  () {
             resetCommandMacro();
             resetSpellsTotals();
         }
-	}));	
+    }));
+    
      on("change:spellmenu_groupby_school change:spellmenu_show_uses change:spellclass-0-hide_unprepared change:spellclass-1-hide_unprepared change:spellclass-2-hide_unprepared change:spellclass-0-show_domain_spells change:spellclass-1-show_domain_spells change:spellclass-2-show_domain_spells", TAS.callback(function eventOptionChange(eventInfo) {
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);

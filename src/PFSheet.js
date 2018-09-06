@@ -462,7 +462,15 @@ function migrate (oldversion, callback, errorCallback) {
 			if (oldversion < 1.697){
 				PFAttacks.recalculate(null,null,oldversion);
 			}
-
+			if (oldversion < 1.72){
+				PFSize.recalculate(oldversion,function(){
+					PFAttacks.adjustAllDamageDiceAsync(null,null);
+				});
+				PFSpells.resetSpellsTotals();
+			}
+			if (oldversion < 1.724){
+				PFSkills.migrate(null,oldversion);
+			}
 		}
 	} catch (err) {
 		TAS.error("PFSheet.migrate", err);
